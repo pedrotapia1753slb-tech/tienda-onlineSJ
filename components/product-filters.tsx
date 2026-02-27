@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
@@ -12,7 +13,7 @@ type ProductFiltersProps = {
   currentParams: { sort?: string; min?: string; max?: string; category?: string }
 }
 
-export function ProductFilters({ categories, currentParams }: ProductFiltersProps) {
+function FiltersInner({ categories, currentParams }: ProductFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [min, setMin] = useState(currentParams.min ?? '')
@@ -92,5 +93,13 @@ export function ProductFilters({ categories, currentParams }: ProductFiltersProp
         </Button>
       </div>
     </div>
+  )
+}
+
+export function ProductFilters(props: ProductFiltersProps) {
+  return (
+    <Suspense fallback={<div className="h-9" />}>
+      <FiltersInner {...props} />
+    </Suspense>
   )
 }

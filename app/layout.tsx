@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Sora } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { Toaster } from 'sonner'
 import { CartProvider } from '@/lib/cart-context'
 import './globals.css'
 
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body className="font-sans antialiased bg-background text-foreground">
         <CartProvider>
           {children}
+          <Toaster richColors position="bottom-right" />
         </CartProvider>
         <Analytics />
       </body>
