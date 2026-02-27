@@ -10,13 +10,13 @@ export async function middleware(request: NextRequest) {
     {
       cookies: {
         getAll: () => request.cookies.getAll(),
-        setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value }: { name: string; value: string }) =>
+        setAll: (cookiesToSet: any[]) => {
+          cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(
-            ({ name, value, options }: { name: string; value: string; options?: object }) =>
+            ({ name, value, options }) =>
               supabaseResponse.cookies.set(name, value, options)
           )
         },
@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
   )
 
   // Refresh the session — keeps auth cookies valid
-  await supabase.auth.getSession()
+  await supabase.auth.getUser()
 
   return supabaseResponse
 }
