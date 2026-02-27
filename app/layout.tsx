@@ -9,13 +9,13 @@ const _dmSans = DM_Sans({ subsets: ['latin'] })
 const _playfair = Playfair_Display({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'MercadoLocal — Tu Mercado del Pueblo',
+  title: 'NovaShopSJ — Tu Tienda Local',
   description:
     'Compra y vende productos frescos, artesanias y más de los mejores vendedores de tu comunidad.',
-  keywords: ['mercado', 'local', 'pueblo', 'frutas', 'verduras', 'artesanias', 'comida'],
+  keywords: ['novashop', 'tienda', 'local', 'pueblo', 'frutas', 'verduras', 'artesanias', 'comida'],
   openGraph: {
-    title: 'MercadoLocal',
-    description: 'Tu mercado comunitario en línea',
+    title: 'NovaShopSJ',
+    description: 'Tu tienda comunitaria en linea',
     type: 'website',
   },
 }

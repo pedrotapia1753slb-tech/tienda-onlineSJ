@@ -43,7 +43,7 @@ export default function LoginPage() {
             </div>
           </Link>
           <h1 className="font-serif text-2xl font-bold text-foreground mt-4">Bienvenido de vuelta</h1>
-          <p className="text-muted-foreground text-sm mt-1">Ingresa a tu cuenta de MercadoLocal</p>
+          <p className="text-muted-foreground text-sm mt-1">Ingresa a tu cuenta de NovaShopSJ</p>
         </div>
 
         <div className="bg-card border border-border rounded-3xl p-8 shadow-sm">

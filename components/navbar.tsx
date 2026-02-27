@@ -51,13 +51,13 @@ export function Navbar({ user, profile }: NavbarProps) {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0 group">
           <div className="w-9 h-9 rounded-sm bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-lg group-hover:opacity-90 transition-opacity">
-            M
+            N
           </div>
           <div className="hidden sm:block">
             <span className="font-serif font-bold text-foreground text-xl leading-none block tracking-tight">
-              Mercado
+              NovaShop
             </span>
-            <span className="text-xs text-muted-foreground leading-none tracking-widest uppercase">Local</span>
+            <span className="text-xs text-muted-foreground leading-none tracking-widest uppercase">SJ</span>
           </div>
         </Link>
 

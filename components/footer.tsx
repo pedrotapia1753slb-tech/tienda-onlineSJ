@@ -9,14 +9,14 @@ export function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center font-serif font-bold text-lg text-primary-foreground">
-                M
+              <div className="w-9 h-9 rounded-sm bg-primary flex items-center justify-center font-serif font-bold text-lg text-primary-foreground">
+                N
               </div>
               <div>
                 <span className="font-serif font-bold text-lg block leading-none text-primary-foreground">
-                  MercadoLocal
+                  NovaShopSJ
                 </span>
-                <span className="text-xs text-primary-foreground/60">Tu mercado del pueblo</span>
+                <span className="text-xs text-primary-foreground/60">Tu tienda del pueblo</span>
               </div>
             </div>
             <p className="text-sm text-primary-foreground/70 leading-relaxed">
@@ -84,14 +84,14 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 shrink-0 text-primary" />
-                hola@mercadolocal.mx
+                hola@novashopsj.mx
               </li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-primary-foreground/10 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-primary-foreground/50">
-          <p>© 2025 MercadoLocal. Todos los derechos reservados.</p>
+          <p>© 2025 NovaShopSJ. Todos los derechos reservados.</p>
           <div className="flex gap-4">
             <Link href="/terms" className="hover:text-primary transition-colors">Terminos</Link>
             <Link href="/privacy" className="hover:text-primary transition-colors">Privacidad</Link>
