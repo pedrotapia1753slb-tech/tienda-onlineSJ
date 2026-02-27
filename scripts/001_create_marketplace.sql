@@ -1,13 +1,5 @@
--- ============================================================
--- MERCADO LOCAL - Marketplace Database Schema
--- ============================================================
-
--- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- ============================================================
--- PROFILES
--- ============================================================
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name TEXT,
@@ -29,15 +21,11 @@ CREATE POLICY "profiles_insert_own" ON public.profiles FOR INSERT WITH CHECK (au
 CREATE POLICY "profiles_update_own" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "profiles_delete_own" ON public.profiles FOR DELETE USING (auth.uid() = id);
 
--- Auto-create profile on signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER LANGUAGE PLPGSQL SECURITY DEFINER SET search_path = public AS $$
 BEGIN
   INSERT INTO public.profiles (id, full_name)
-  VALUES (
-    NEW.id,
-    COALESCE(NEW.raw_user_meta_data ->> 'full_name', NULL)
-  )
+  VALUES (NEW.id, COALESCE(NEW.raw_user_meta_data ->> 'full_name', NULL))
   ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
 END;
@@ -48,9 +36,6 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- ============================================================
--- CATEGORIES
--- ============================================================
 CREATE TABLE IF NOT EXISTS public.categories (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
@@ -64,11 +49,8 @@ CREATE TABLE IF NOT EXISTS public.categories (
 
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "categories_select_all" ON public.categories FOR SELECT USING (TRUE);
-CREATE POLICY "categories_manage_auth" ON public.categories FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "categories_manage_auth" ON public.categories FOR ALL USING (auth.uid() IS NOT NULL);
 
--- ============================================================
--- PRODUCTS
--- ============================================================
 CREATE TABLE IF NOT EXISTS public.products (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   seller_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -95,9 +77,6 @@ CREATE POLICY "products_insert_own" ON public.products FOR INSERT WITH CHECK (au
 CREATE POLICY "products_update_own" ON public.products FOR UPDATE USING (auth.uid() = seller_id);
 CREATE POLICY "products_delete_own" ON public.products FOR DELETE USING (auth.uid() = seller_id);
 
--- ============================================================
--- ORDERS
--- ============================================================
 CREATE TABLE IF NOT EXISTS public.orders (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   buyer_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -114,9 +93,6 @@ CREATE POLICY "orders_select_own" ON public.orders FOR SELECT USING (auth.uid() 
 CREATE POLICY "orders_insert_own" ON public.orders FOR INSERT WITH CHECK (auth.uid() = buyer_id);
 CREATE POLICY "orders_update_own" ON public.orders FOR UPDATE USING (auth.uid() = buyer_id);
 
--- ============================================================
--- ORDER ITEMS
--- ============================================================
 CREATE TABLE IF NOT EXISTS public.order_items (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   order_id UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
@@ -137,9 +113,6 @@ CREATE POLICY "order_items_insert_own" ON public.order_items FOR INSERT WITH CHE
   EXISTS (SELECT 1 FROM public.orders WHERE orders.id = order_id AND orders.buyer_id = auth.uid())
 );
 
--- ============================================================
--- REVIEWS
--- ============================================================
 CREATE TABLE IF NOT EXISTS public.reviews (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
@@ -156,16 +129,13 @@ CREATE POLICY "reviews_insert_own" ON public.reviews FOR INSERT WITH CHECK (auth
 CREATE POLICY "reviews_update_own" ON public.reviews FOR UPDATE USING (auth.uid() = buyer_id);
 CREATE POLICY "reviews_delete_own" ON public.reviews FOR DELETE USING (auth.uid() = buyer_id);
 
--- ============================================================
--- SEED DATA - Categories
--- ============================================================
 INSERT INTO public.categories (name, slug, icon, description) VALUES
-  ('Frutas y Verduras', 'frutas-verduras', '🥦', 'Productos frescos del campo'),
-  ('Carnes y Embutidos', 'carnes-embutidos', '🥩', 'Carnes frescas y procesadas'),
-  ('Lácteos y Huevos', 'lacteos-huevos', '🥛', 'Productos lácteos frescos'),
-  ('Panadería', 'panaderia', '🍞', 'Pan y productos horneados'),
-  ('Abarrotes', 'abarrotes', '🛒', 'Productos de despensa'),
-  ('Artesanías', 'artesanias', '🏺', 'Productos artesanales locales'),
-  ('Bebidas', 'bebidas', '🧃', 'Bebidas naturales y embotelladas'),
-  ('Comida Preparada', 'comida-preparada', '🍽️', 'Platillos y comidas listas')
+  ('Frutas y Verduras', 'frutas-verduras', 'Carrot', 'Productos frescos del campo'),
+  ('Carnes y Embutidos', 'carnes-embutidos', 'Beef', 'Carnes frescas y procesadas'),
+  ('Lacteos y Huevos', 'lacteos-huevos', 'Milk', 'Productos lacteos frescos'),
+  ('Panaderia', 'panaderia', 'Wheat', 'Pan y productos horneados'),
+  ('Abarrotes', 'abarrotes', 'ShoppingBasket', 'Productos de despensa'),
+  ('Artesanias', 'artesanias', 'Palette', 'Productos artesanales locales'),
+  ('Bebidas', 'bebidas', 'GlassWater', 'Bebidas naturales y embotelladas'),
+  ('Comida Preparada', 'comida-preparada', 'Utensils', 'Platillos y comidas listas')
 ON CONFLICT (slug) DO NOTHING;
