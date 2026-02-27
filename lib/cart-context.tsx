@@ -19,7 +19,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
 
   useEffect(() => {
-    const stored = localStorage.getItem('mercado-cart')
+    const stored = localStorage.getItem('novashopsj-cart')
     if (stored) {
       try {
         setItems(JSON.parse(stored))
@@ -28,7 +28,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    localStorage.setItem('mercado-cart', JSON.stringify(items))
+    localStorage.setItem('novashopsj-cart', JSON.stringify(items))
   }, [items])
 
   const addItem = useCallback((product: Product, quantity = 1) => {
