@@ -1,0 +1,249 @@
+'use client'
+
+import Image from 'next/image'
+import { useState } from 'react'
+import { ShoppingCart, Plus, Minus, Star, Store, Package, ArrowLeft } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { useCart } from '@/lib/cart-context'
+import type { Product, Review } from '@/lib/types'
+import { toast } from 'sonner'
+import Link from 'next/link'
+
+type ProductDetailClientProps = {
+  product: Product
+  reviews: Review[]
+  relatedProducts: Product[]
+}
+
+export function ProductDetailClient({ product, reviews }: ProductDetailClientProps) {
+  const { addItem } = useCart()
+  const [quantity, setQuantity] = useState(1)
+  const [selectedImage, setSelectedImage] = useState(0)
+
+  const discount = product.original_price
+    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
+    : 0
+
+  function handleAdd() {
+    addItem(product, quantity)
+    toast.success(`${product.name} agregado al carrito`)
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+        <Link href="/" className="hover:text-primary transition-colors flex items-center gap-1">
+          <ArrowLeft className="w-3.5 h-3.5" /> Inicio
+        </Link>
+        {product.categories && (
+          <>
+            <span>/</span>
+            <Link href={`/category/${product.categories.slug}`} className="hover:text-primary transition-colors">
+              {product.categories.name}
+            </Link>
+          </>
+        )}
+        <span>/</span>
+        <span className="text-foreground truncate max-w-48">{product.name}</span>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        {/* Images */}
+        <div className="space-y-3">
+          <div className="relative aspect-square rounded-2xl overflow-hidden bg-secondary border border-border">
+            {product.images?.[selectedImage] ? (
+              <Image
+                src={product.images[selectedImage]}
+                alt={product.name}
+                fill
+                className="object-cover"
+                priority
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Package className="w-16 h-16 text-muted-foreground/30" />
+              </div>
+            )}
+            {discount > 0 && (
+              <Badge className="absolute top-4 left-4 bg-red-500 text-white text-sm px-3">
+                -{discount}%
+              </Badge>
+            )}
+          </div>
+          {product.images && product.images.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {product.images.map((img, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSelectedImage(i)}
+                  className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-colors ${
+                    i === selectedImage ? 'border-primary' : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  <Image src={img} alt={`Imagen ${i + 1}`} fill className="object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Info */}
+        <div className="space-y-5">
+          {product.profiles?.shop_name && (
+            <Link href={`/seller/${product.seller_id}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Store className="w-4 h-4" />
+              {product.profiles.shop_name}
+            </Link>
+          )}
+          <h1 className="font-serif text-3xl font-bold text-foreground text-balance leading-tight">
+            {product.name}
+          </h1>
+
+          {/* Rating */}
+          {product.review_count > 0 && (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-0.5">
+                {[1, 2, 3, 4, 5].map(n => (
+                  <Star
+                    key={n}
+                    className={`w-4 h-4 ${n <= Math.round(product.rating) ? 'fill-primary text-primary' : 'text-border fill-border'}`}
+                  />
+                ))}
+              </div>
+              <span className="text-sm font-medium">{product.rating.toFixed(1)}</span>
+              <span className="text-sm text-muted-foreground">({product.review_count} opiniones)</span>
+            </div>
+          )}
+
+          {/* Price */}
+          <div className="flex items-baseline gap-3">
+            <span className="text-4xl font-bold text-foreground">${product.price.toFixed(2)}</span>
+            {product.original_price && (
+              <span className="text-xl text-muted-foreground line-through">${product.original_price.toFixed(2)}</span>
+            )}
+            <span className="text-sm text-muted-foreground">/ {product.unit}</span>
+          </div>
+
+          {/* Stock */}
+          <div className="flex items-center gap-2">
+            {product.stock > 0 ? (
+              <>
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="text-sm text-muted-foreground">
+                  {product.stock < 10 ? `Solo quedan ${product.stock}` : 'En stock'}
+                </span>
+              </>
+            ) : (
+              <>
+                <div className="w-2 h-2 rounded-full bg-red-500" />
+                <span className="text-sm text-red-500 font-medium">Agotado</span>
+              </>
+            )}
+          </div>
+
+          <Separator />
+
+          {/* Quantity + Add */}
+          {product.stock > 0 && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-medium text-foreground">Cantidad:</span>
+                <div className="flex items-center gap-0 border border-border rounded-xl overflow-hidden">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10 rounded-none"
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                  >
+                    <Minus className="w-4 h-4" />
+                  </Button>
+                  <span className="w-12 text-center font-semibold text-foreground">{quantity}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10 rounded-none"
+                    onClick={() => setQuantity(q => Math.min(product.stock, q + 1))}
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Button size="lg" className="flex-1 gap-2" onClick={handleAdd}>
+                  <ShoppingCart className="w-5 h-5" />
+                  Agregar al carrito
+                </Button>
+                <Button size="lg" variant="outline" className="flex-1" asChild>
+                  <Link href="/cart">Ver carrito</Link>
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Tags */}
+          {product.tags && product.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 pt-2">
+              {product.tags.map(tag => (
+                <Badge key={tag} variant="secondary" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
+
+          {/* Description */}
+          {product.description && (
+            <div className="space-y-2">
+              <h2 className="font-semibold text-foreground">Descripcion del producto</h2>
+              <p className="text-muted-foreground text-sm leading-relaxed">{product.description}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Reviews */}
+      {reviews.length > 0 && (
+        <section className="mt-12">
+          <h2 className="font-serif text-2xl font-bold text-foreground mb-6">
+            Opiniones ({reviews.length})
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {reviews.map(review => (
+              <div key={review.id} className="bg-card border border-border rounded-2xl p-5">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm shrink-0">
+                    {review.profiles?.full_name?.[0] ?? 'U'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="font-medium text-sm text-foreground truncate">
+                        {review.profiles?.full_name ?? 'Usuario'}
+                      </span>
+                      <div className="flex items-center gap-0.5 shrink-0">
+                        {[1, 2, 3, 4, 5].map(n => (
+                          <Star
+                            key={n}
+                            className={`w-3 h-3 ${n <= review.rating ? 'fill-primary text-primary' : 'text-border fill-border'}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    {review.comment && (
+                      <p className="text-sm text-muted-foreground leading-relaxed">{review.comment}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {new Date(review.created_at).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  )
+}
