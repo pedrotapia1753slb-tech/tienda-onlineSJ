@@ -43,58 +43,58 @@ export default async function HomePage() {
       <Navbar user={user} profile={profile} />
       <main>
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-secondary">
-          <div className="max-w-7xl mx-auto px-4 py-10 lg:py-16">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              <div className="space-y-5">
-                <Badge className="bg-primary/10 text-primary border-primary/20 text-sm px-3 py-1">
-                  <Leaf className="w-3.5 h-3.5 mr-1.5" />
+        <section className="relative overflow-hidden bg-secondary border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 py-12 lg:py-20">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+              <div className="space-y-6">
+                <Badge className="bg-primary/10 text-primary border-primary/20 text-xs px-3 py-1 rounded-sm font-medium tracking-widest uppercase">
+                  <Leaf className="w-3 h-3 mr-1.5" />
                   Productos 100% locales y frescos
                 </Badge>
-                <h1 className="font-serif text-4xl lg:text-5xl font-bold text-foreground leading-tight text-balance">
+                <h1 className="font-serif text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground leading-tight tracking-tight text-balance">
                   El mercado de tu<br />
                   <span className="text-primary">comunidad</span>, en linea
                 </h1>
-                <p className="text-muted-foreground text-lg leading-relaxed">
+                <p className="text-muted-foreground text-lg leading-relaxed max-w-md">
                   Compra directamente a productores y artesanos de tu pueblo. Fresco, autentico y con entrega a domicilio.
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  <Button size="lg" asChild className="gap-2">
+                  <Button size="lg" asChild className="gap-2 rounded-sm">
                     <Link href="/products">
                       Explorar productos <ArrowRight className="w-4 h-4" />
                     </Link>
                   </Button>
-                  <Button size="lg" variant="outline" asChild>
+                  <Button size="lg" variant="outline" asChild className="rounded-sm border-foreground/30 hover:bg-foreground hover:text-primary-foreground">
                     <Link href="/auth/register">Vender aqui</Link>
                   </Button>
                 </div>
                 {/* Trust badges */}
-                <div className="flex flex-wrap gap-4 pt-2">
+                <div className="flex flex-wrap gap-5 pt-2 border-t border-border">
                   {[
                     { icon: ShieldCheck, label: 'Compra segura' },
                     { icon: Truck, label: 'Entrega local' },
                     { icon: Users, label: '+200 vendedores' },
                   ].map(({ icon: Icon, label }) => (
-                    <div key={label} className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <div key={label} className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Icon className="w-4 h-4 text-primary" />
                       {label}
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="relative rounded-3xl overflow-hidden shadow-xl aspect-[4/3] lg:aspect-square">
+              <div className="relative rounded-sm overflow-hidden shadow-2xl aspect-[4/3] lg:aspect-square border border-border">
                 <Image
                   src="/images/hero-market.jpg"
                   alt="Mercado local con productos frescos"
                   fill
-                  className="object-cover"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
                   priority
                 />
                 {/* Floating card */}
-                <div className="absolute bottom-4 left-4 bg-card/95 backdrop-blur-sm rounded-2xl p-4 shadow-lg max-w-48">
-                  <p className="text-xs text-muted-foreground mb-1">Vendedores activos</p>
+                <div className="absolute bottom-4 left-4 bg-card/95 backdrop-blur-sm rounded-sm p-4 shadow-xl border border-border max-w-48">
+                  <p className="text-xs text-muted-foreground mb-1 uppercase tracking-widest">Vendedores activos</p>
                   <p className="font-serif font-bold text-2xl text-foreground">200+</p>
-                  <p className="text-xs text-primary mt-1 font-medium">en tu comunidad</p>
+                  <p className="text-xs text-primary mt-1 font-semibold tracking-wide">en tu comunidad</p>
                 </div>
               </div>
             </div>
@@ -128,17 +128,18 @@ export default async function HomePage() {
 
         {/* Banner */}
         <section className="max-w-7xl mx-auto px-4 py-6">
-          <div className="bg-primary rounded-3xl p-8 lg:p-12 flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="bg-foreground rounded-sm p-8 lg:p-12 flex flex-col lg:flex-row items-center justify-between gap-6 border border-border">
             <div>
+              <p className="text-xs text-accent uppercase tracking-widest font-semibold mb-2">Para productores y artesanos</p>
               <h2 className="font-serif text-2xl lg:text-3xl font-bold text-primary-foreground text-balance">
                 ¿Tienes un negocio o eres productor?
               </h2>
-              <p className="text-primary-foreground/80 mt-2 max-w-md">
-                Regista tu tienda gratis y llega a cientos de clientes en tu comunidad. Simple, rapido y sin comisiones el primer mes.
+              <p className="text-primary-foreground/60 mt-2 max-w-md text-sm leading-relaxed">
+                Registra tu tienda gratis y llega a cientos de clientes en tu comunidad. Simple, rapido y sin comisiones el primer mes.
               </p>
             </div>
             <div className="flex gap-3 shrink-0">
-              <Button size="lg" variant="secondary" asChild>
+              <Button size="lg" className="rounded-sm bg-primary-foreground text-foreground hover:bg-primary-foreground/90" asChild>
                 <Link href="/auth/register">Comenzar gratis</Link>
               </Button>
             </div>

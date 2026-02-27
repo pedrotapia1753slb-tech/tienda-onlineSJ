@@ -25,9 +25,9 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <Link href={`/product/${product.id}`} className="group block">
-      <div className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-md hover:border-primary/30 transition-all duration-200">
+      <div className="bg-card border border-border rounded-sm overflow-hidden hover:shadow-lg hover:border-primary/40 transition-all duration-200 group-hover:-translate-y-0.5">
         {/* Image */}
-        <div className="relative aspect-square bg-secondary overflow-hidden">
+        <div className="relative aspect-square bg-muted overflow-hidden">
           {image ? (
             <Image
               src={image}
@@ -49,7 +49,7 @@ export function ProductCard({ product }: { product: Product }) {
               </Badge>
             )}
             {discount > 0 && (
-              <Badge className="bg-red-500 text-white text-xs px-2 py-0.5">
+              <Badge className="bg-accent text-accent-foreground text-xs px-2 py-0.5 font-semibold">
                 -{discount}%
               </Badge>
             )}
@@ -65,7 +65,7 @@ export function ProductCard({ product }: { product: Product }) {
           <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <Button
               size="icon"
-              className="h-8 w-8 rounded-full shadow-md"
+              className="h-8 w-8 rounded-sm shadow-md"
               onClick={handleAddToCart}
               disabled={product.stock === 0}
               aria-label="Agregar al carrito"

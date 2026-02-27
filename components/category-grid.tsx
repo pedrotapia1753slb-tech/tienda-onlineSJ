@@ -17,22 +17,26 @@ type Category = {
 }
 
 export function CategoryGrid({ categories }: { categories: Category[] }) {
+  // Elegant green-toned icon backgrounds cycling through primary/accent/muted shades
   const colors = [
-    'bg-orange-100 text-orange-600',
-    'bg-red-100 text-red-600',
-    'bg-yellow-100 text-yellow-600',
-    'bg-amber-100 text-amber-700',
-    'bg-lime-100 text-lime-700',
-    'bg-pink-100 text-pink-600',
-    'bg-teal-100 text-teal-600',
-    'bg-rose-100 text-rose-600',
+    'bg-primary/10 text-primary',
+    'bg-accent/20 text-accent-foreground',
+    'bg-secondary text-primary',
+    'bg-primary/15 text-primary',
+    'bg-accent/15 text-accent-foreground',
+    'bg-muted text-primary',
+    'bg-primary/10 text-primary',
+    'bg-secondary text-primary',
   ]
 
   return (
     <section>
       <div className="flex items-center justify-between mb-5">
-        <h2 className="font-serif text-2xl font-bold text-foreground">Categorias</h2>
-        <Link href="/products" className="text-sm text-primary hover:underline font-medium">
+        <div>
+          <h2 className="font-serif text-2xl font-bold text-foreground tracking-tight">Categorias</h2>
+          <p className="text-xs text-muted-foreground uppercase tracking-widest mt-0.5">Explora por seccion</p>
+        </div>
+        <Link href="/products" className="text-sm text-primary hover:underline font-medium tracking-wide">
           Ver todo
         </Link>
       </div>
@@ -44,9 +48,9 @@ export function CategoryGrid({ categories }: { categories: Category[] }) {
             <Link
               key={cat.id}
               href={`/category/${cat.slug}`}
-              className="flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-2xl hover:border-primary hover:shadow-sm transition-all group"
+              className="flex flex-col items-center gap-2.5 p-4 bg-card border border-border rounded-sm hover:border-primary hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
             >
-              <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${colorClass} group-hover:scale-110 transition-transform`}>
+              <div className={`w-11 h-11 rounded-sm flex items-center justify-center ${colorClass} group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-200`}>
                 <IconEl className="w-5 h-5" />
               </div>
               <span className="text-xs font-medium text-center text-foreground leading-tight">

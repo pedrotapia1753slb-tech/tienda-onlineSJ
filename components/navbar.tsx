@@ -40,8 +40,8 @@ export function Navbar({ user, profile }: NavbarProps) {
 
   return (
     <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
-      {/* Top bar */}
-      <div className="bg-primary text-primary-foreground text-xs py-1.5 px-4 text-center font-sans">
+      {/* Top bar — deep green banner */}
+      <div className="bg-primary text-primary-foreground text-xs py-1.5 px-4 text-center font-sans tracking-wide">
         <MapPin className="inline w-3 h-3 mr-1" />
         Entrega en tu comunidad — Productos frescos y locales cada dia
       </div>
@@ -50,14 +50,14 @@ export function Navbar({ user, profile }: NavbarProps) {
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0 group">
-          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-lg group-hover:opacity-90 transition-opacity">
+          <div className="w-9 h-9 rounded-sm bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-lg group-hover:opacity-90 transition-opacity">
             M
           </div>
           <div className="hidden sm:block">
-            <span className="font-serif font-bold text-foreground text-xl leading-none block">
+            <span className="font-serif font-bold text-foreground text-xl leading-none block tracking-tight">
               Mercado
             </span>
-            <span className="text-xs text-muted-foreground leading-none">Local</span>
+            <span className="text-xs text-muted-foreground leading-none tracking-widest uppercase">Local</span>
           </div>
         </Link>
 
@@ -69,7 +69,7 @@ export function Navbar({ user, profile }: NavbarProps) {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Busca frutas, carnes, artesanias..."
-              className="pl-9 pr-4 h-10 bg-secondary border-border rounded-full text-sm"
+              className="pl-9 pr-4 h-10 bg-muted border-border rounded-sm text-sm focus-visible:ring-primary/50"
             />
           </div>
         </form>
@@ -79,7 +79,7 @@ export function Navbar({ user, profile }: NavbarProps) {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-1.5 hidden sm:flex">
+                <Button variant="ghost" size="sm" className="gap-1.5 hidden sm:flex hover:bg-secondary">
                   <User className="w-4 h-4" />
                   <span className="text-sm max-w-24 truncate">
                     {profile?.full_name?.split(' ')[0] || 'Mi cuenta'}
@@ -120,10 +120,10 @@ export function Navbar({ user, profile }: NavbarProps) {
             </DropdownMenu>
           ) : (
             <div className="hidden sm:flex items-center gap-2">
-              <Button variant="ghost" size="sm" asChild>
+              <Button variant="ghost" size="sm" asChild className="hover:bg-secondary">
                 <Link href="/auth/login">Ingresar</Link>
               </Button>
-              <Button size="sm" asChild>
+              <Button size="sm" asChild className="rounded-sm">
                 <Link href="/auth/register">Registrarse</Link>
               </Button>
             </div>
@@ -131,7 +131,7 @@ export function Navbar({ user, profile }: NavbarProps) {
 
           {/* Cart */}
           <Link href="/cart" className="relative">
-            <Button variant="ghost" size="icon" aria-label="Carrito de compras">
+            <Button variant="ghost" size="icon" aria-label="Carrito de compras" className="hover:bg-secondary">
               <ShoppingCart className="w-5 h-5" />
               {count > 0 && (
                 <Badge className="absolute -top-1 -right-1 h-5 min-w-5 p-0 flex items-center justify-center text-xs bg-primary text-primary-foreground border-0 rounded-full">
@@ -145,7 +145,7 @@ export function Navbar({ user, profile }: NavbarProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="sm:hidden"
+            className="sm:hidden hover:bg-secondary"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Menu"
           >
@@ -155,7 +155,7 @@ export function Navbar({ user, profile }: NavbarProps) {
       </div>
 
       {/* Category nav bar */}
-      <nav className="border-t border-border bg-secondary overflow-x-auto scrollbar-none hidden sm:block">
+      <nav className="border-t border-border bg-foreground overflow-x-auto scrollbar-none hidden sm:block">
         <div className="max-w-7xl mx-auto px-4">
           <ul className="flex items-center gap-0 text-sm">
             {[
@@ -172,7 +172,7 @@ export function Navbar({ user, profile }: NavbarProps) {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="px-3 py-2 inline-block text-foreground/80 hover:text-primary hover:bg-primary/8 transition-colors whitespace-nowrap"
+                  className="px-3 py-2.5 inline-block text-primary-foreground/70 hover:text-primary-foreground hover:bg-white/10 transition-colors whitespace-nowrap text-xs tracking-wide uppercase font-medium"
                 >
                   {item.label}
                 </Link>

@@ -1,12 +1,8 @@
 import type { Metadata } from 'next'
-import { Inter, Sora } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
-import { Toaster } from 'sonner'
-import { CartProvider } from '@/lib/cart-context'
-import './globals.css'
+import { DM_Sans, Playfair_Display } from 'next/font/google'
 
-const _inter = Inter({ subsets: ['latin'] })
-const _sora = Sora({ subsets: ['latin'] })
+const _dmSans = DM_Sans({ subsets: ['latin'] })
+const _playfair = Playfair_Display({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'MercadoLocal — Tu Mercado del Pueblo',
