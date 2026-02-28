@@ -25,12 +25,7 @@ export function CheckoutAddressForm({
     const [locationError, setLocationError] = useState('')
     const [accuracyWarning, setAccuracyWarning] = useState('')
 
-    // Auto-detect on mount if no address code exists
-    useEffect(() => {
-        if (!addressCode) {
-            detectLocation()
-        }
-    }, [addressCode])
+    // Auto-detect removed per user request (manual only)
 
     const detectLocation = () => {
         setIsLocating(true)

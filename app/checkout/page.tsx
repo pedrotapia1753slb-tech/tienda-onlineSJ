@@ -32,6 +32,7 @@ export default function CheckoutPage() {
   })
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
 
   useEffect(() => {
     const supabase = createClient()
@@ -50,7 +51,10 @@ export default function CheckoutPage() {
                 address_code: data.address_code || '',
               }))
             }
+            setAuthLoading(false)
           })
+      } else {
+        setAuthLoading(false)
       }
     })
   }, [])
@@ -58,7 +62,7 @@ export default function CheckoutPage() {
   if (items.length === 0 && !success) {
     return (
       <>
-        <Navbar user={user} profile={profile} />
+        <Navbar user={user} profile={profile} authLoading={authLoading} />
         <main className="max-w-7xl mx-auto px-4 py-20 text-center">
           <ShoppingBag className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
           <h1 className="font-serif text-2xl font-bold text-foreground mb-2">Tu carrito esta vacio</h1>
@@ -74,7 +78,7 @@ export default function CheckoutPage() {
   if (success) {
     return (
       <>
-        <Navbar user={user} profile={profile} />
+        <Navbar user={user} profile={profile} authLoading={authLoading} />
         <main className="max-w-md mx-auto px-4 py-20 text-center">
           <div className="w-16 h-16 rounded-2xl bg-green-100 flex items-center justify-center mx-auto mb-5">
             <CheckCircle className="w-8 h-8 text-green-600" />
@@ -115,12 +119,23 @@ export default function CheckoutPage() {
       return
     }
 
-    // Create order
+    // Update user profile with latest details
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .update({
+        full_name: form.full_name,
+        phone: form.phone,
+        address: form.address,
+        address_code: form.address_code || null,
+      })
+      .eq('id', user.id)
+
+    // Create order (including 10 Bs shipping fee)
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
         buyer_id: user.id,
-        total,
+        total: total + 10,
         delivery_address: `${form.full_name} | ${form.phone} | ${form.address}`,
         address_code: form.address_code || null,
         notes: form.notes || null,
@@ -159,7 +174,7 @@ export default function CheckoutPage() {
 
   return (
     <>
-      <Navbar user={user} profile={profile} />
+      <Navbar user={user} profile={profile} authLoading={authLoading} />
       <main className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="font-serif text-3xl font-bold text-foreground mb-8">Finalizar pedido</h1>
 
@@ -185,13 +200,19 @@ export default function CheckoutPage() {
                 <div className="space-y-2">
                   <Label htmlFor="phone">
                     <Phone className="w-3.5 h-3.5 inline mr-1" />
-                    Telefono
+                    Telefono móvil (Bolivia)
                   </Label>
                   <Input
                     id="phone"
-                    value={form.phone}
-                    onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-                    placeholder="(555) 123-4567"
+                    value={form.phone.startsWith('+591') ? form.phone : `+591 ${form.phone}`}
+                    onChange={e => {
+                      let val = e.target.value
+                      if (!val.startsWith('+591 ')) val = '+591 '
+                      // allow only digits after prefix, max 8
+                      const digits = val.slice(5).replace(/\D/g, '').slice(0, 8)
+                      setForm(f => ({ ...f, phone: `+591 ${digits}` }))
+                    }}
+                    placeholder="+591 71234567"
                     type="tel"
                     required
                   />
@@ -222,7 +243,7 @@ export default function CheckoutPage() {
 
             <Button type="submit" size="lg" className="w-full" disabled={loading}>
               {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-              Confirmar pedido — Bs {(total + 10).toFixed(2)}
+              Confirmar pedido — Bs {(total + 10).toFixed(0)}
             </Button>
           </form>
 
@@ -247,7 +268,7 @@ export default function CheckoutPage() {
                       <p className="text-xs text-muted-foreground">x{item.quantity}</p>
                     </div>
                     <p className="text-sm font-semibold text-foreground shrink-0">
-                      Bs {(item.product.price * item.quantity).toFixed(2)}
+                      Bs {(item.product.price * item.quantity).toFixed(0)}
                     </p>
                   </div>
                 ))}
@@ -255,16 +276,16 @@ export default function CheckoutPage() {
               <Separator className="my-4" />
               <div className="flex justify-between text-sm text-muted-foreground mb-1">
                 <span>Subtotal</span>
-                <span>Bs {total.toFixed(2)}</span>
+                <span>Bs {total.toFixed(0)}</span>
               </div>
               <div className="flex justify-between text-sm text-muted-foreground mb-3">
                 <span>Envío y seguridad</span>
-                <span>Bs 10.00</span>
+                <span>Bs 10</span>
               </div>
               <Separator className="my-3" />
               <div className="flex justify-between font-bold text-foreground text-lg">
                 <span>Total</span>
-                <span>Bs {(total + 10).toFixed(2)}</span>
+                <span>Bs {(total + 10).toFixed(0)}</span>
               </div>
               <p className="text-xs text-muted-foreground mt-3 text-center">
                 Pago contra entrega en tu domicilio

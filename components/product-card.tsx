@@ -99,7 +99,7 @@ export function ProductCard({ product }: { product: Product }) {
           {/* Price */}
           <div className="flex items-end gap-2 mt-auto">
             <span className="font-bold text-foreground text-lg leading-none">
-              Bs {product.price.toFixed(2)}
+              Bs {product.price.toFixed(0)}
             </span>
             <span className="text-xs text-muted-foreground ml-auto">/{product.unit}</span>
           </div>

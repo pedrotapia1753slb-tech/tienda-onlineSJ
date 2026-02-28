@@ -399,7 +399,7 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
                       <p className="text-xs text-muted-foreground mt-0.5">{(product.categories as any).name}</p>
                     )}
                     <div className="flex items-center gap-3 mt-1">
-                      <span className="font-bold text-foreground">Bs {product.price.toFixed(2)}</span>
+                      <span className="font-bold text-foreground">Bs {product.price.toFixed(0)}</span>
                       <span className="text-xs text-muted-foreground">Stock: {product.stock}</span>
                     </div>
                   </div>
@@ -438,7 +438,7 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="font-bold text-foreground">Bs {oi.total?.toFixed(2)}</p>
+                    <p className="font-bold text-foreground">Bs {oi.total?.toFixed(0)}</p>
                     <p className="text-xs text-muted-foreground">x{oi.quantity}</p>
                   </div>
                   <OrderStatusBadge status={oi.orders?.status} />

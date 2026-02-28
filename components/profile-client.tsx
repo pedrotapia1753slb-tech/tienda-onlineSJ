@@ -25,6 +25,7 @@ export function ProfileClient({ user, profile: initialProfile }: ProfileClientPr
     full_name: initialProfile?.full_name ?? '',
     phone: initialProfile?.phone ?? '',
     address: initialProfile?.address ?? '',
+    address_code: initialProfile?.address_code ?? '',
     is_seller: initialProfile?.is_seller ?? false,
     shop_name: initialProfile?.shop_name ?? '',
     shop_description: initialProfile?.shop_description ?? '',
@@ -41,6 +42,7 @@ export function ProfileClient({ user, profile: initialProfile }: ProfileClientPr
         full_name: form.full_name || null,
         phone: form.phone || null,
         address: form.address || null,
+        address_code: form.address_code || null,
         is_seller: form.is_seller,
         shop_name: form.is_seller ? (form.full_name || null) : null,
         shop_description: null,
@@ -114,12 +116,17 @@ export function ProfileClient({ user, profile: initialProfile }: ProfileClientPr
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone">Telefono</Label>
+            <Label htmlFor="phone">Telefono móvil (Bolivia)</Label>
             <Input
               id="phone"
-              value={form.phone}
-              onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-              placeholder="(555) 123-4567"
+              value={form.phone.startsWith('+591') ? form.phone : `+591 ${form.phone}`}
+              onChange={e => {
+                let val = e.target.value
+                if (!val.startsWith('+591 ')) val = '+591 '
+                const digits = val.slice(5).replace(/\D/g, '').slice(0, 8)
+                setForm(f => ({ ...f, phone: `+591 ${digits}` }))
+              }}
+              placeholder="+591 71234567"
               type="tel"
             />
           </div>
@@ -132,6 +139,26 @@ export function ProfileClient({ user, profile: initialProfile }: ProfileClientPr
               placeholder="Tu direccion de entrega habitual"
               rows={2}
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="address_code">Código Plus (ubicación)</Label>
+            <div className="flex gap-2">
+              <Input
+                id="address_code"
+                value={form.address_code}
+                onChange={e => setForm(f => ({ ...f, address_code: e.target.value.toUpperCase() }))}
+                placeholder="Ej: 57R9J94J+7H"
+                className="font-mono text-sm"
+              />
+              {form.address_code && form.address_code.includes('+') && (
+                <Button type="button" variant="outline" size="sm" asChild className="shrink-0">
+                  <a href={`https://plus.codes/${form.address_code}`} target="_blank" rel="noopener noreferrer">
+                    Ver mapa
+                  </a>
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">Busca tu código en <a href="https://plus.codes/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">plus.codes</a></p>
           </div>
         </div>
 
@@ -155,12 +182,20 @@ export function ProfileClient({ user, profile: initialProfile }: ProfileClientPr
       </form>
 
       <div className="mt-6">
-        <form action="/auth/signout" method="post">
-          <Button type="submit" variant="outline" className="w-full gap-2 text-destructive border-destructive/30 hover:bg-destructive/5">
-            <LogOut className="w-4 h-4" />
-            Cerrar sesion
-          </Button>
-        </form>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full gap-2 text-destructive border-destructive/30 hover:bg-destructive/5"
+          onClick={async () => {
+            try {
+              await fetch('/auth/signout', { method: 'POST', redirect: 'manual' })
+            } catch { }
+            window.location.href = '/'
+          }}
+        >
+          <LogOut className="w-4 h-4" />
+          Cerrar sesion
+        </Button>
       </div>
     </div>
   )

@@ -4,111 +4,109 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* ── E-commerce Trust Palette (MercadoLibre / Amazon Style) ── */
+  /* ── Black, Bright Orange, & White Palette ── */
 
-  /* Background Principal: Gris extremadamente claro para que las tarjetas blancas de productos salten a la vista */
-  --background: oklch(0.98 0.005 260);
-  /* Foreground Principal: Texto oscuro para legibilidad (Gris carbón) */
-  --foreground: oklch(0.2 0.02 260);
+  /* Background Principal: Blanco puro para un look super limpio */
+  --background: oklch(1 0 0);
+  /* Foreground Principal: Negro puro para máximo contraste */
+  --foreground: oklch(0 0 0);
 
-  /* Cards (Tarjetas de productos): Blanco puro */
+  /* Cards: Blanco puro  */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.02 260);
+  --card-foreground: oklch(0 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.02 260);
+  --popover-foreground: oklch(0 0 0);
 
-  /* Primary (Menú superior y marca): Azul Marino Profundo (Estilo Amazon) */
-  /* Si prefirieses el estílo MercadoLibre, este sería Amarillo: oklch(0.9 0.2 100) */
-  --primary: oklch(0.25 0.04 260);
+  /* Primary (Botones principales, marcas): Negro Absoluto */
+  --primary: oklch(0.15 0 0);
   --primary-foreground: oklch(1 0 0);
-  /* Texto blanco sobre el nav azul oscuro */
 
-  /* Secondary: Gris suave para elementos secundarios */
-  --secondary: oklch(0.95 0.01 260);
-  --secondary-foreground: oklch(0.2 0.02 260);
+  /* Secondary: Gris super claro */
+  --secondary: oklch(0.96 0 0);
+  --secondary-foreground: oklch(0.15 0 0);
 
-  /* Muted: Textos deshabilitados o bordes finos */
-  --muted: oklch(0.95 0.01 260);
-  --muted-foreground: oklch(0.55 0.02 260);
+  /* Muted: Textos deshabilitados o subtextos */
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.55 0 0);
 
-  /* Accent (Botones de "Comprar", Llamados a la acción): Naranja/Amarillo Vibrante */
-  --accent: oklch(0.75 0.18 55);
-  --accent-foreground: oklch(0.15 0.02 260);
-  /* Texto oscuro/negro potente sobre el botón naranja/amarillo */
+  /* Accent (Destacados, Call to Action, Hover states): Naranja Brillante */
+  --accent: oklch(0.70 0.25 45);
+  --accent-foreground: oklch(1 0 0);
 
+  /* Destructive */
   --destructive: oklch(0.52 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
 
-  /* Borders: separaciones limpias */
-  --border: oklch(0.90 0.01 260);
-  --input: oklch(0.90 0.01 260);
-  --ring: oklch(0.75 0.18 55);
-  /* El foco (ring) usa el color naranja vibrante */
+  /* Borders & Inputs */
+  --border: oklch(0.90 0 0);
+  --input: oklch(0.90 0 0);
+  --ring: oklch(0.70 0.25 45);
 
   /* Charts */
-  --chart-1: oklch(0.25 0.04 260);
-  --chart-2: oklch(0.75 0.18 55);
-  --chart-3: oklch(0.5 0.1 260);
-  --chart-4: oklch(0.8 0.05 250);
-  --chart-5: oklch(0.3 0.05 260);
+  --chart-1: oklch(0.70 0.25 45);
+  --chart-2: oklch(0.2 0 0);
+  --chart-3: oklch(0.5 0 0);
+  --chart-4: oklch(0.8 0 0);
+  --chart-5: oklch(0.3 0 0);
 
-  --radius: 0.25rem;
+  --radius: 0.5rem;
 
   /* Sidebar */
-  --sidebar: oklch(0.98 0.01 260);
-  --sidebar-foreground: oklch(0.2 0.02 260);
-  --sidebar-primary: oklch(0.25 0.04 260);
+  --sidebar: oklch(0.98 0 0);
+  --sidebar-foreground: oklch(0.15 0 0);
+  --sidebar-primary: oklch(0.70 0.25 45);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.95 0.01 260);
-  --sidebar-accent-foreground: oklch(0.2 0.02 260);
-  --sidebar-border: oklch(0.90 0.01 260);
-  --sidebar-ring: oklch(0.75 0.18 55);
+  --sidebar-accent: oklch(0.95 0 0);
+  --sidebar-accent-foreground: oklch(0.15 0 0);
+  --sidebar-border: oklch(0.90 0 0);
+  --sidebar-ring: oklch(0.70 0.25 45);
 }
 
 .dark {
-  /* E-commerce Dark Mode */
-  --background: oklch(0.15 0.02 260);
-  --foreground: oklch(0.98 0.01 260);
+  /* Dark Mode: Negro profundo, Naranja Brillante y Blanco */
+  --background: oklch(0.12 0 0);
+  --foreground: oklch(0.98 0 0);
 
-  --card: oklch(0.18 0.02 260);
-  --card-foreground: oklch(0.98 0.01 260);
-  --popover: oklch(0.18 0.02 260);
-  --popover-foreground: oklch(0.98 0.01 260);
+  --card: oklch(0.15 0 0);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.15 0 0);
+  --popover-foreground: oklch(0.98 0 0);
 
-  --primary: oklch(0.98 0.01 260);
-  --primary-foreground: oklch(0.15 0.02 260);
+  /* Primary: Naranja Brillante en fondos oscuros */
+  --primary: oklch(0.70 0.25 45);
+  --primary-foreground: oklch(1 0 0);
 
-  --secondary: oklch(0.22 0.02 260);
-  --secondary-foreground: oklch(0.98 0.01 260);
+  --secondary: oklch(0.20 0 0);
+  --secondary-foreground: oklch(0.98 0 0);
 
-  --muted: oklch(0.22 0.02 260);
-  --muted-foreground: oklch(0.7 0.02 260);
+  --muted: oklch(0.20 0 0);
+  --muted-foreground: oklch(0.65 0 0);
 
-  /* Se mantiene el mismo naranja para asegurar visibilidad de botones de compra */
-  --accent: oklch(0.75 0.18 55);
-  --accent-foreground: oklch(0.15 0.02 260);
+  /* Accent: Naranja Intenso */
+  --accent: oklch(0.70 0.25 45);
+  --accent-foreground: oklch(1 0 0);
 
   --destructive: oklch(0.46 0.20 25);
   --destructive-foreground: oklch(0.95 0 0);
 
-  --border: oklch(0.25 0.02 260);
-  --input: oklch(0.25 0.02 260);
-  --ring: oklch(0.75 0.18 55);
+  --border: oklch(0.25 0 0);
+  --input: oklch(0.25 0 0);
+  --ring: oklch(0.70 0.25 45);
 
-  --chart-1: oklch(0.75 0.18 55);
-  --chart-2: oklch(0.8 0.05 250);
-  --chart-3: oklch(0.5 0.1 260);
-  --chart-4: oklch(0.7 0.05 260);
-  --chart-5: oklch(0.3 0.05 260);
+  --chart-1: oklch(0.70 0.25 45);
+  --chart-2: oklch(0.98 0 0);
+  --chart-3: oklch(0.5 0 0);
+  --chart-4: oklch(0.7 0 0);
+  --chart-5: oklch(0.3 0 0);
 
-  --sidebar: oklch(0.12 0.02 260);
-  --sidebar-foreground: oklch(0.98 0.01 260);
-  --sidebar-primary: oklch(0.75 0.18 55);
-  --sidebar-primary-foreground: oklch(0.15 0.02 260);
-  --sidebar-accent: oklch(0.22 0.02 260);
-  --sidebar-accent-foreground: oklch(0.98 0.01 260);
-  --sidebar-border: oklch(0.25 0.02 260);
-  --sidebar-ring: oklch(0.75 0.18 55);
+  --sidebar: oklch(0.12 0 0);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.70 0.25 45);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.20 0 0);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.25 0 0);
+  --sidebar-ring: oklch(0.70 0.25 45);
 }
 
 @theme inline {

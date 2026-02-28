@@ -17,6 +17,7 @@ export default function CartPage() {
   const { items, removeItem, updateQuantity, total, clearCart } = useCart()
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
 
   useEffect(() => {
     const supabase = createClient()
@@ -24,7 +25,12 @@ export default function CartPage() {
       if (user) {
         setUser(user)
         supabase.from('profiles').select('*').eq('id', user.id).single()
-          .then(({ data }) => setProfile(data))
+          .then(({ data }) => {
+            setProfile(data)
+            setAuthLoading(false)
+          })
+      } else {
+        setAuthLoading(false)
       }
     })
   }, [])
@@ -32,7 +38,7 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <>
-        <Navbar user={user} profile={profile} />
+        <Navbar user={user} profile={profile} authLoading={authLoading} />
         <main className="max-w-7xl mx-auto px-4 py-20 text-center">
           <div className="max-w-sm mx-auto">
             <div className="w-20 h-20 rounded-3xl bg-secondary flex items-center justify-center mx-auto mb-5">
@@ -57,7 +63,7 @@ export default function CartPage() {
 
   return (
     <>
-      <Navbar user={user} profile={profile} />
+      <Navbar user={user} profile={profile} authLoading={authLoading} />
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="font-serif text-3xl font-bold text-foreground">Mi carrito</h1>
@@ -98,7 +104,7 @@ export default function CartPage() {
                   {item.product.profiles?.shop_name && (
                     <p className="text-xs text-muted-foreground mt-0.5">{item.product.profiles.shop_name}</p>
                   )}
-                  <p className="font-bold text-foreground mt-1">Bs {item.product.price.toFixed(2)}/{item.product.unit}</p>
+                  <p className="font-bold text-foreground mt-1">Bs {item.product.price.toFixed(0)}/{item.product.unit}</p>
                 </div>
 
                 <div className="flex flex-col items-end gap-3">
@@ -129,7 +135,7 @@ export default function CartPage() {
                     </Button>
                   </div>
                   <p className="text-sm font-bold text-foreground">
-                    Bs {(item.product.price * item.quantity).toFixed(2)}
+                    Bs {(item.product.price * item.quantity).toFixed(0)}
                   </p>
                 </div>
               </div>
@@ -144,23 +150,23 @@ export default function CartPage() {
                 {items.map(item => (
                   <div key={item.product.id} className="flex justify-between text-muted-foreground">
                     <span className="truncate flex-1 mr-2">{item.product.name} x{item.quantity}</span>
-                    <span className="shrink-0">Bs {(item.product.price * item.quantity).toFixed(2)}</span>
+                    <span className="shrink-0">Bs {(item.product.price * item.quantity).toFixed(0)}</span>
                   </div>
                 ))}
               </div>
               <Separator className="my-4" />
               <div className="flex justify-between text-sm text-muted-foreground mb-1">
                 <span>Subtotal</span>
-                <span>Bs {total.toFixed(2)}</span>
+                <span>Bs {total.toFixed(0)}</span>
               </div>
               <div className="flex justify-between text-sm text-muted-foreground mb-3">
                 <span>Envío y seguridad</span>
-                <span>Bs 10.00</span>
+                <span>Bs 10</span>
               </div>
               <Separator className="my-3" />
               <div className="flex justify-between font-bold text-foreground text-lg mb-6">
                 <span>Total</span>
-                <span>Bs {(total + 10).toFixed(2)}</span>
+                <span>Bs {(total + 10).toFixed(0)}</span>
               </div>
               <Button size="lg" className="w-full" asChild>
                 <Link href="/checkout">Proceder al pago</Link>

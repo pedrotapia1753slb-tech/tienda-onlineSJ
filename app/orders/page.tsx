@@ -62,7 +62,7 @@ export default async function OrdersPage() {
                       <p className="text-xs text-muted-foreground">
                         {new Date(order.created_at).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}
                       </p>
-                      <p className="font-bold text-foreground">Bs {Number(order.total).toFixed(2)}</p>
+                      <p className="font-bold text-foreground">Bs {Number(order.total).toFixed(0)}</p>
                     </div>
                     <span className={`text-xs px-3 py-1 rounded-full font-medium ${status.className}`}>
                       {status.label}
@@ -91,14 +91,33 @@ export default async function OrdersPage() {
                           )}
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-sm font-semibold text-foreground">Bs {Number(oi.total).toFixed(2)}</p>
+                          <p className="text-sm font-semibold text-foreground">Bs {Number(oi.total).toFixed(0)}</p>
                           <p className="text-xs text-muted-foreground">x{oi.quantity} {oi.products?.unit}</p>
                         </div>
                       </div>
                     ))}
+
+                    {/* Nota envío */}
+                    <p className="text-xs text-muted-foreground pt-2 border-t border-border">
+                      + Bs 10 Envío y seguridad incluidos en el total
+                    </p>
+
                     {order.delivery_address && (
                       <p className="text-xs text-muted-foreground pt-2 border-t border-border">
                         Entrega: {order.delivery_address}
+                      </p>
+                    )}
+                    {order.address_code && (
+                      <p className="text-xs text-muted-foreground">
+                        Ubicación:{' '}
+                        <a
+                          href={`https://plus.codes/${order.address_code}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-mono text-primary hover:underline"
+                        >
+                          {order.address_code}
+                        </a>
                       </p>
                     )}
                   </div>

@@ -24,6 +24,7 @@ import { createClient } from '@/lib/supabase/client'
 type NavbarProps = {
   user?: { id: string; email?: string } | null
   profile?: Profile | null
+  authLoading?: boolean
 }
 
 type NavCategory = {
@@ -43,7 +44,7 @@ const DEFAULT_CATEGORIES: NavCategory[] = [
   { label: 'Comida Preparada', href: '/category/comida-preparada' },
 ]
 
-export function Navbar({ user, profile }: NavbarProps) {
+export function Navbar({ user, profile, authLoading }: NavbarProps) {
   const { count } = useCart()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -54,6 +55,13 @@ export function Navbar({ user, profile }: NavbarProps) {
   const [showLive, setShowLive] = useState(false)
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
   const searchRef = useRef<HTMLFormElement>(null)
+
+  async function handleLogout() {
+    try {
+      await fetch('/auth/signout', { method: 'POST', redirect: 'manual' })
+    } catch { }
+    window.location.href = '/'
+  }
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -185,7 +193,7 @@ export function Navbar({ user, profile }: NavbarProps) {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
                         <div className="flex items-center gap-2 text-xs">
-                          <span className="font-semibold">Bs {product.price.toFixed(2)}</span>
+                          <span className="font-semibold">Bs {product.price.toFixed(0)}</span>
                           {product.categories?.name && (
                             <span className="text-muted-foreground border-l border-border pl-2">{product.categories.name}</span>
                           )}
@@ -255,15 +263,15 @@ export function Navbar({ user, profile }: NavbarProps) {
                   </>
                 )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <form action="/auth/signout" method="post">
-                    <button type="submit" className="flex items-center gap-2 w-full text-destructive">
-                      <LogOut className="w-4 h-4" /> Cerrar sesion
-                    </button>
-                  </form>
+                <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 w-full text-destructive cursor-pointer">
+                  <LogOut className="w-4 h-4" /> Cerrar sesion
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          ) : authLoading ? (
+            <div className="hidden sm:flex items-center gap-2 px-6">
+              <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
+            </div>
           ) : (
             <div className="hidden sm:flex items-center gap-2">
               <Button variant="ghost" size="sm" asChild className="hover:bg-secondary">
@@ -348,11 +356,13 @@ export function Navbar({ user, profile }: NavbarProps) {
                   <Shield className="w-4 h-4" /> Admin Panel
                 </Link>
               )}
-              <form action="/auth/signout" method="post" className="w-full">
-                <button type="submit" className="flex items-center gap-2 py-2 text-sm text-destructive w-full" onClick={() => setMobileOpen(false)}>
-                  <LogOut className="w-4 h-4" /> Cerrar sesion
-                </button>
-              </form>
+              <button
+                type="button"
+                className="flex items-center gap-2 py-2 text-sm text-destructive w-full"
+                onClick={() => { setMobileOpen(false); handleLogout() }}
+              >
+                <LogOut className="w-4 h-4" /> Cerrar sesion
+              </button>
             </div>
           )}
           <div className="pt-2 border-t border-border">

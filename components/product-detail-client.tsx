@@ -219,7 +219,7 @@ export function ProductDetailClient({ product, reviews }: ProductDetailClientPro
 
           {/* Price */}
           <div className="flex items-baseline gap-3">
-            <span className="text-4xl font-bold text-foreground">Bs {product.price.toFixed(2)}</span>
+            <span className="text-4xl font-bold text-foreground">Bs {product.price.toFixed(0)}</span>
             <span className="text-sm text-muted-foreground">/ {product.unit}</span>
           </div>
 
