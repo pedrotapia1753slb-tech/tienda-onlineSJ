@@ -7,6 +7,7 @@ export type Profile = {
   address_code?: string | null
   is_seller: boolean
   is_admin: boolean
+  is_delivery: boolean
   shop_name: string | null
   shop_description: string | null
   shop_logo_url: string | null
@@ -51,14 +52,20 @@ export type Product = {
 export type Order = {
   id: string
   buyer_id: string
+  delivery_id?: string | null
   status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
   total: number
   delivery_address: string | null
   address_code?: string | null
   notes: string | null
+  payment_method?: 'qr' | 'cash'
+  payment_proof_url?: string | null
+  payment_status?: 'pending' | 'verified' | 'rejected'
   created_at: string
   updated_at: string
   order_items?: OrderItem[]
+  profiles?: Profile
+  delivery?: Profile | null
 }
 
 export type OrderItem = {

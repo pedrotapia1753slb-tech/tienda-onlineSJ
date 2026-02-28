@@ -64,6 +64,25 @@ export async function middleware(request: NextRequest) {
       }
     }
 
+    // -------------------------------------------------------------
+    // PROTECCIÓN DE RUTAS DELIVERY (/delivery/*)
+    // -------------------------------------------------------------
+    if (request.nextUrl.pathname.startsWith('/delivery')) {
+      if (!user) {
+        return NextResponse.redirect(new URL('/auth/login', request.url))
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_delivery, is_admin')
+        .eq('id', user.id)
+        .single()
+
+      if (!profile?.is_delivery && !profile?.is_admin) {
+        return NextResponse.redirect(new URL('/', request.url))
+      }
+    }
+
     return supabaseResponse
   } catch (error) {
     // Si algo mas falla, simplemente ignoramos el error y dejamos cargar la pagina sin romper el servidor

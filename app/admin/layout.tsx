@@ -1,4 +1,4 @@
-import { LayoutDashboard, Tags, LogOut, ArrowLeft } from 'lucide-react'
+import { LayoutDashboard, Tags, LogOut, ArrowLeft, ShoppingBag, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
@@ -22,9 +22,21 @@ export default function AdminLayout({
                         <LayoutDashboard className="w-5 h-5" />
                         Dashboard
                     </Link>
-                    <Link href="/admin/categories" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-primary/10 text-primary">
+                    <Link href="/admin/orders" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-secondary/80 transition-colors text-muted-foreground hover:text-foreground">
+                        <ShoppingBag className="w-5 h-5" />
+                        Pedidos
+                    </Link>
+                    <Link href="/admin/users" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-secondary/80 transition-colors text-muted-foreground hover:text-foreground">
+                        <Users className="w-5 h-5" />
+                        Usuarios
+                    </Link>
+                    <Link href="/admin/categories" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-secondary/80 transition-colors text-muted-foreground hover:text-foreground">
                         <Tags className="w-5 h-5" />
                         Categorias
+                    </Link>
+                    <Link href="/admin/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-secondary/80 transition-colors text-muted-foreground hover:text-foreground">
+                        <Settings className="w-5 h-5" />
+                        Configuración
                     </Link>
                 </nav>
 

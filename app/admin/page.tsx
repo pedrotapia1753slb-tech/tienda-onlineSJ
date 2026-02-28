@@ -46,18 +46,18 @@ export default async function AdminDashboardPage() {
                     </div>
                 </Link>
 
-                {/* Placeholders for future growth */}
-                <div className="block bg-secondary/50 border border-border/50 rounded-2xl p-6 opacity-60">
+                {/* Users */}
+                <Link href="/admin/users" className="group block bg-card border border-border shadow-sm rounded-2xl p-6 hover:border-primary/50 transition-colors">
                     <div className="flex items-start justify-between">
                         <div>
-                            <p className="text-lg font-semibold text-foreground">Vendedores</p>
-                            <p className="text-sm text-muted-foreground mt-1">Gestión de cuentas de vendedores (Próximamente).</p>
+                            <p className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">Usuarios</p>
+                            <p className="text-sm text-muted-foreground mt-1">Filtra vendedores, usuarios y delivery. Asigna rol delivery.</p>
                         </div>
-                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
-                            <Users className="w-5 h-5 text-muted-foreground" />
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                            <Users className="w-5 h-5 text-primary" />
                         </div>
                     </div>
-                </div>
+                </Link>
 
                 <div className="block bg-secondary/50 border border-border/50 rounded-2xl p-6 opacity-60">
                     <div className="flex items-start justify-between">

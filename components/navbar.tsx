@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import {
   ShoppingCart, Search, Menu, X, User,
-  ChevronDown, Store, Package, LogOut, Shield, Loader2
+  ChevronDown, Store, Package, LogOut, Shield, Loader2, Truck
 } from 'lucide-react'
 import { useCart } from '@/lib/cart-context'
 import { Button } from '@/components/ui/button'
@@ -262,6 +262,13 @@ export function Navbar({ user, profile, authLoading }: NavbarProps) {
                     </DropdownMenuItem>
                   </>
                 )}
+                {profile?.is_delivery && (
+                  <DropdownMenuItem asChild>
+                    <a href="/delivery" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                      <Truck className="w-4 h-4" /> Panel delivery
+                    </a>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 w-full text-destructive cursor-pointer">
                   <LogOut className="w-4 h-4" /> Cerrar sesion
@@ -355,6 +362,11 @@ export function Navbar({ user, profile, authLoading }: NavbarProps) {
                 <Link href="/admin" className="flex items-center gap-2 py-2 text-sm text-primary font-medium" onClick={() => setMobileOpen(false)}>
                   <Shield className="w-4 h-4" /> Admin Panel
                 </Link>
+              )}
+              {profile?.is_delivery && (
+                <a href="/delivery" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 py-2 text-sm text-foreground" onClick={() => setMobileOpen(false)}>
+                  <Truck className="w-4 h-4" /> Panel delivery
+                </a>
               )}
               <button
                 type="button"
