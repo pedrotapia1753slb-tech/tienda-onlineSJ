@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 import { CheckoutAddressForm } from '@/components/checkout-address-form'
+import { PaymentQR } from '@/components/payment-qr'
 import { Loader2, ShoppingBag, CheckCircle, MapPin, Phone, FileText } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -33,6 +34,8 @@ export default function CheckoutPage() {
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
+  const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
+  const [orderTotal, setOrderTotal] = useState<number>(0)
 
   useEffect(() => {
     const supabase = createClient()
@@ -75,26 +78,15 @@ export default function CheckoutPage() {
     )
   }
 
-  if (success) {
+  if (success && createdOrderId) {
     return (
       <>
         <Navbar user={user} profile={profile} authLoading={authLoading} />
-        <main className="max-w-md mx-auto px-4 py-20 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-green-100 flex items-center justify-center mx-auto mb-5">
-            <CheckCircle className="w-8 h-8 text-green-600" />
-          </div>
-          <h1 className="font-serif text-2xl font-bold text-foreground mb-2">Pedido confirmado</h1>
-          <p className="text-muted-foreground mb-6">
-            Tu pedido fue recibido. Los vendedores se pondran en contacto contigo pronto.
-          </p>
-          <div className="flex gap-3 justify-center">
-            <Button asChild>
-              <Link href="/orders">Ver mis pedidos</Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="/">Seguir comprando</Link>
-            </Button>
-          </div>
+        <main className="max-w-7xl mx-auto px-4 py-12 flex flex-col items-center">
+          <PaymentQR
+            orderId={createdOrderId}
+            totalPrice={orderTotal}
+          />
         </main>
         <Footer />
       </>
@@ -168,6 +160,8 @@ export default function CheckoutPage() {
     }
 
     clearCart()
+    setOrderTotal(total + 10)
+    setCreatedOrderId(order.id)
     setSuccess(true)
     setLoading(false)
   }
