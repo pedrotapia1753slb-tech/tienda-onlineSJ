@@ -62,7 +62,7 @@ export default async function OrdersPage() {
                       <p className="text-xs text-muted-foreground">
                         {new Date(order.created_at).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}
                       </p>
-                      <p className="font-bold text-foreground">${Number(order.total).toFixed(2)}</p>
+                      <p className="font-bold text-foreground">Bs {Number(order.total).toFixed(2)}</p>
                     </div>
                     <span className={`text-xs px-3 py-1 rounded-full font-medium ${status.className}`}>
                       {status.label}
@@ -91,7 +91,7 @@ export default async function OrdersPage() {
                           )}
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-sm font-semibold text-foreground">${Number(oi.total).toFixed(2)}</p>
+                          <p className="text-sm font-semibold text-foreground">Bs {Number(oi.total).toFixed(2)}</p>
                           <p className="text-xs text-muted-foreground">x{oi.quantity} {oi.products?.unit}</p>
                         </div>
                       </div>

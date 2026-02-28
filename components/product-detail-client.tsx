@@ -23,10 +23,6 @@ export function ProductDetailClient({ product, reviews }: ProductDetailClientPro
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
 
-  const discount = product.original_price
-    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
-    : 0
-
   function handleAdd() {
     addItem(product, quantity)
     toast.success(`${product.name} agregado al carrito`)
@@ -53,39 +49,10 @@ export function ProductDetailClient({ product, reviews }: ProductDetailClientPro
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {/* Images */}
-        <div className="space-y-3">
-          <div className="relative aspect-square rounded-2xl overflow-hidden bg-secondary border border-border">
-            {product.images?.[selectedImage] ? (
-              product.images[selectedImage].includes('res.cloudinary.com') ? (
-                <CldImage
-                  src={product.images[selectedImage]}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              ) : (
-                <Image
-                  src={product.images[selectedImage]}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              )
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Package className="w-16 h-16 text-muted-foreground/30" />
-              </div>
-            )}
-            {discount > 0 && (
-              <Badge className="absolute top-4 left-4 bg-red-500 text-white text-sm px-3">
-                -{discount}%
-              </Badge>
-            )}
-          </div>
+        <div className="flex flex-col-reverse lg:flex-row gap-3">
+          {/* Thumbnails */}
           {product.images && product.images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto lg:max-h-[500px] pb-1 lg:pb-0 lg:pr-1">
               {product.images.map((img, i) => (
                 <button
                   key={i}
@@ -102,14 +69,40 @@ export function ProductDetailClient({ product, reviews }: ProductDetailClientPro
               ))}
             </div>
           )}
+          {/* Main image */}
+          <div className="relative aspect-square rounded-2xl overflow-hidden bg-black border border-border flex-1">
+            {product.images?.[selectedImage] ? (
+              product.images[selectedImage].includes('res.cloudinary.com') ? (
+                <CldImage
+                  src={product.images[selectedImage]}
+                  alt={product.name}
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              ) : (
+                <Image
+                  src={product.images[selectedImage]}
+                  alt={product.name}
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              )
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Package className="w-16 h-16 text-muted-foreground/30" />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Info */}
         <div className="space-y-5">
-          {product.profiles?.shop_name && (
+          {(product.profiles?.shop_name || product.profiles?.full_name) && (
             <Link href={`/seller/${product.seller_id}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
               <Store className="w-4 h-4" />
-              {product.profiles.shop_name}
+              {product.profiles.shop_name || product.profiles.full_name}
             </Link>
           )}
           <h1 className="font-serif text-3xl font-bold text-foreground text-balance leading-tight">
@@ -134,10 +127,7 @@ export function ProductDetailClient({ product, reviews }: ProductDetailClientPro
 
           {/* Price */}
           <div className="flex items-baseline gap-3">
-            <span className="text-4xl font-bold text-foreground">${product.price.toFixed(2)}</span>
-            {product.original_price && (
-              <span className="text-xl text-muted-foreground line-through">${product.original_price.toFixed(2)}</span>
-            )}
+            <span className="text-4xl font-bold text-foreground">Bs {product.price.toFixed(2)}</span>
             <span className="text-sm text-muted-foreground">/ {product.unit}</span>
           </div>
 

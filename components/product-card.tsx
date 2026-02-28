@@ -12,9 +12,6 @@ import { CldImage } from 'next-cloudinary'
 
 export function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart()
-  const discount = product.original_price
-    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
-    : 0
   const image = product.images?.[0]
 
   function handleAddToCart(e: React.MouseEvent) {
@@ -25,17 +22,17 @@ export function ProductCard({ product }: { product: Product }) {
   }
 
   return (
-    <Link href={`/product/${product.id}`} className="group block">
-      <div className="bg-card border border-border rounded-sm overflow-hidden hover:shadow-lg hover:border-primary/40 transition-all duration-200 group-hover:-translate-y-0.5">
+    <Link href={`/product/${product.id}`} className="group block h-full">
+      <div className="bg-card border border-border rounded-sm overflow-hidden hover:shadow-lg hover:border-primary/40 transition-all duration-200 group-hover:-translate-y-0.5 h-full flex flex-col">
         {/* Image */}
-        <div className="relative aspect-square bg-muted overflow-hidden">
+        <div className="relative aspect-square bg-black overflow-hidden">
           {image ? (
             image.includes('res.cloudinary.com') ? (
               <CldImage
                 src={image}
                 alt={product.name}
                 fill
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                className="object-contain group-hover:scale-105 transition-transform duration-300"
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               />
             ) : (
@@ -43,7 +40,7 @@ export function ProductCard({ product }: { product: Product }) {
                 src={image}
                 alt={product.name}
                 fill
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                className="object-contain group-hover:scale-105 transition-transform duration-300"
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               />
             )
@@ -53,18 +50,11 @@ export function ProductCard({ product }: { product: Product }) {
             </div>
           )}
           {/* Badges */}
-          <div className="absolute top-2 left-2 flex flex-col gap-1">
-            {product.is_featured && (
-              <Badge className="bg-primary text-primary-foreground text-xs px-2 py-0.5">
-                Destacado
-              </Badge>
-            )}
-            {discount > 0 && (
-              <Badge className="bg-accent text-accent-foreground text-xs px-2 py-0.5 font-semibold">
-                -{discount}%
-              </Badge>
-            )}
-          </div>
+          {product.is_featured && (
+            <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-0.5">
+              Destacado
+            </Badge>
+          )}
           {product.stock === 0 && (
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
               <span className="text-white text-sm font-semibold bg-black/60 px-3 py-1 rounded-full">
@@ -87,13 +77,13 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         {/* Info */}
-        <div className="p-3">
+        <div className="p-3 flex flex-col flex-1">
           {product.profiles?.shop_name && (
             <p className="text-xs text-muted-foreground mb-1 truncate">
               {product.profiles.shop_name}
             </p>
           )}
-          <h3 className="font-medium text-sm text-foreground leading-tight line-clamp-2 mb-2">
+          <h3 className="font-medium text-sm text-foreground leading-tight line-clamp-1 mb-2">
             {product.name}
           </h3>
 
@@ -107,15 +97,10 @@ export function ProductCard({ product }: { product: Product }) {
           )}
 
           {/* Price */}
-          <div className="flex items-end gap-2">
+          <div className="flex items-end gap-2 mt-auto">
             <span className="font-bold text-foreground text-lg leading-none">
-              ${product.price.toFixed(2)}
+              Bs {product.price.toFixed(2)}
             </span>
-            {product.original_price && (
-              <span className="text-xs text-muted-foreground line-through">
-                ${product.original_price.toFixed(2)}
-              </span>
-            )}
             <span className="text-xs text-muted-foreground ml-auto">/{product.unit}</span>
           </div>
         </div>

@@ -58,13 +58,13 @@ export default function CartPage() {
                 key={item.product.id}
                 className="bg-card border border-border rounded-2xl p-4 flex items-center gap-4"
               >
-                <Link href={`/product/${item.product.id}`} className="relative w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-secondary">
+                <Link href={`/product/${item.product.id}`} className="relative w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-black">
                   {item.product.images?.[0] ? (
                     <Image
                       src={item.product.images[0]}
                       alt={item.product.name}
                       fill
-                      className="object-cover"
+                      className="object-contain"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-muted-foreground/30">
@@ -82,7 +82,7 @@ export default function CartPage() {
                   {item.product.profiles?.shop_name && (
                     <p className="text-xs text-muted-foreground mt-0.5">{item.product.profiles.shop_name}</p>
                   )}
-                  <p className="font-bold text-foreground mt-1">${item.product.price.toFixed(2)}/{item.product.unit}</p>
+                  <p className="font-bold text-foreground mt-1">Bs {item.product.price.toFixed(2)}/{item.product.unit}</p>
                 </div>
 
                 <div className="flex flex-col items-end gap-3">
@@ -113,7 +113,7 @@ export default function CartPage() {
                     </Button>
                   </div>
                   <p className="text-sm font-bold text-foreground">
-                    ${(item.product.price * item.quantity).toFixed(2)}
+                    Bs {(item.product.price * item.quantity).toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -128,14 +128,23 @@ export default function CartPage() {
                 {items.map(item => (
                   <div key={item.product.id} className="flex justify-between text-muted-foreground">
                     <span className="truncate flex-1 mr-2">{item.product.name} x{item.quantity}</span>
-                    <span className="shrink-0">${(item.product.price * item.quantity).toFixed(2)}</span>
+                    <span className="shrink-0">Bs {(item.product.price * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
               <Separator className="my-4" />
+              <div className="flex justify-between text-sm text-muted-foreground mb-1">
+                <span>Subtotal</span>
+                <span>Bs {total.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm text-muted-foreground mb-3">
+                <span>Envío y seguridad</span>
+                <span>Bs 10.00</span>
+              </div>
+              <Separator className="my-3" />
               <div className="flex justify-between font-bold text-foreground text-lg mb-6">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>Bs {(total + 10).toFixed(2)}</span>
               </div>
               <Button size="lg" className="w-full" asChild>
                 <Link href="/checkout">Proceder al pago</Link>

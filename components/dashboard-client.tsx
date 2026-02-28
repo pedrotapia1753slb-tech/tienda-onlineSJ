@@ -36,7 +36,6 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
     name: '',
     description: '',
     price: '',
-    original_price: '',
     stock: '',
     unit: 'unidad',
     category_id: '',
@@ -48,7 +47,7 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
 
   function openNew() {
     setEditingProduct(null)
-    setForm({ name: '', description: '', price: '', original_price: '', stock: '', unit: 'unidad', category_id: '', images: [], tags: '', is_featured: false, is_active: true })
+    setForm({ name: '', description: '', price: '', stock: '', unit: 'unidad', category_id: '', images: [], tags: '', is_featured: false, is_active: true })
     setShowForm(true)
   }
 
@@ -58,7 +57,6 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
       name: p.name,
       description: p.description ?? '',
       price: String(p.price),
-      original_price: p.original_price ? String(p.original_price) : '',
       stock: String(p.stock),
       unit: p.unit,
       category_id: p.category_id ?? '',
@@ -81,7 +79,7 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
       name: form.name,
       description: form.description || null,
       price: parseFloat(form.price),
-      original_price: form.original_price ? parseFloat(form.original_price) : null,
+      original_price: null,
       stock: parseInt(form.stock) || 0,
       unit: form.unit,
       category_id: form.category_id || null,
@@ -157,7 +155,7 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
           { label: 'Productos activos', value: activeCount, icon: Package, color: 'text-primary' },
           { label: 'Total en stock', value: totalStock, icon: BarChart3, color: 'text-blue-500' },
           { label: 'Pedidos recibidos', value: orderItems.length, icon: ShoppingBag, color: 'text-green-500' },
-          { label: 'Ingresos totales', value: `$${totalRevenue.toFixed(0)}`, icon: DollarSign, color: 'text-accent' },
+          { label: 'Ingresos totales', value: `Bs ${totalRevenue.toFixed(0)}`, icon: DollarSign, color: 'text-accent' },
         ].map(stat => (
           <div key={stat.label} className="bg-card border border-border rounded-2xl p-5">
             <div className="flex items-center justify-between mb-2">
@@ -176,9 +174,9 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
             {editingProduct ? 'Editar producto' : 'Nuevo producto'}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2 space-y-2">
+            <div className="space-y-2">
               <Label>Nombre del producto *</Label>
-              <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Ej. Jitomates organicos" />
+              <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Nombre del producto" />
             </div>
             <div className="sm:col-span-2 space-y-2">
               <Label>Descripcion</Label>
@@ -187,10 +185,6 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
             <div className="space-y-2">
               <Label>Precio *</Label>
               <Input type="number" step="0.01" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="0.00" />
-            </div>
-            <div className="space-y-2">
-              <Label>Precio original (opcional)</Label>
-              <Input type="number" step="0.01" value={form.original_price} onChange={e => setForm(f => ({ ...f, original_price: e.target.value }))} placeholder="0.00" />
             </div>
             <div className="space-y-2">
               <Label>Stock disponible</Label>
@@ -223,11 +217,22 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
               {form.images.length > 0 && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
                   {form.images.map((url, i) => (
-                    <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-border bg-secondary group">
-                      <Image src={url} alt={`Imagen ${i + 1}`} fill className="object-cover" />
+                    <div key={i} className={`relative aspect-square rounded-xl overflow-hidden border-2 bg-black group cursor-pointer ${i === 0 ? 'border-primary ring-2 ring-primary/30' : 'border-border'}`}
+                      onClick={() => {
+                        if (i === 0) return
+                        setForm(f => {
+                          const imgs = [...f.images]
+                          const [selected] = imgs.splice(i, 1)
+                          imgs.unshift(selected)
+                          return { ...f, images: imgs }
+                        })
+                      }}
+                    >
+                      <Image src={url} alt={`Imagen ${i + 1}`} fill className="object-contain" />
+                      {i === 0 && <span className="absolute bottom-1 left-1 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full font-medium">Principal</span>}
                       <button
                         type="button"
-                        onClick={() => setForm(f => ({ ...f, images: f.images.filter((_, index) => index !== i) }))}
+                        onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, images: f.images.filter((_, index) => index !== i) })) }}
                         className="absolute top-1 right-1 bg-black/60 hover:bg-destructive text-white p-1.5 rounded-full transition-colors opacity-0 group-hover:opacity-100"
                         aria-label="Eliminar imagen"
                       >
@@ -258,7 +263,7 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
             </div>
             <div className="space-y-2">
               <Label>Etiquetas (separadas por comas)</Label>
-              <Input value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} placeholder="organico, fresco, local" />
+              <Input value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} placeholder="tecnologia, celular" />
             </div>
             <div className="flex items-center justify-between p-4 bg-secondary rounded-2xl">
               <div>
@@ -327,7 +332,7 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
                       <p className="text-xs text-muted-foreground mt-0.5">{(product.categories as any).name}</p>
                     )}
                     <div className="flex items-center gap-3 mt-1">
-                      <span className="font-bold text-foreground">${product.price.toFixed(2)}</span>
+                      <span className="font-bold text-foreground">Bs {product.price.toFixed(2)}</span>
                       <span className="text-xs text-muted-foreground">Stock: {product.stock}</span>
                     </div>
                   </div>
@@ -366,7 +371,7 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="font-bold text-foreground">${oi.total?.toFixed(2)}</p>
+                    <p className="font-bold text-foreground">Bs {oi.total?.toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground">x{oi.quantity}</p>
                   </div>
                   <OrderStatusBadge status={oi.orders?.status} />

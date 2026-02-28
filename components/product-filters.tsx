@@ -76,7 +76,7 @@ function FiltersInner({ categories, currentParams }: ProductFiltersProps) {
         <Input
           value={min}
           onChange={e => setMin(e.target.value)}
-          placeholder="Min $"
+          placeholder="Min Bs"
           type="number"
           className="w-20 h-9 text-sm"
         />
@@ -84,7 +84,7 @@ function FiltersInner({ categories, currentParams }: ProductFiltersProps) {
         <Input
           value={max}
           onChange={e => setMax(e.target.value)}
-          placeholder="Max $"
+          placeholder="Max Bs"
           type="number"
           className="w-20 h-9 text-sm"
         />
