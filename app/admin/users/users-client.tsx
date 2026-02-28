@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
-import { Users, Store, Truck, Shield, User as UserIcon, Loader2 } from 'lucide-react'
+import { Users, Store, Truck, User as UserIcon, Loader2, Search } from 'lucide-react'
 import type { Profile } from '@/lib/types'
 
 type FilterType = 'all' | 'seller' | 'normal' | 'delivery'
@@ -22,16 +23,24 @@ function getRoleBadges(profile: Profile) {
 export default function UsersClient({ initialProfiles }: { initialProfiles: Profile[] }) {
     const [profiles, setProfiles] = useState(initialProfiles)
     const [filter, setFilter] = useState<FilterType>('all')
+    const [query, setQuery] = useState('')
     const [updatingId, setUpdatingId] = useState<string | null>(null)
     const supabase = createClient()
 
-    const filtered = profiles.filter(p => {
-        if (filter === 'all') return true
-        if (filter === 'seller') return p.is_seller
-        if (filter === 'normal') return !p.is_seller && !p.is_delivery && !p.is_admin
-        if (filter === 'delivery') return p.is_delivery
-        return true
-    })
+    const filtered = profiles
+        .filter(p => {
+            if (filter === 'all') return true
+            if (filter === 'seller') return p.is_seller
+            if (filter === 'normal') return !p.is_seller && !p.is_delivery && !p.is_admin
+            if (filter === 'delivery') return p.is_delivery
+            return true
+        })
+        .filter(p => {
+            const q = query.trim().toLowerCase()
+            if (!q) return true
+            const haystack = [p.full_name ?? '', p.phone ?? '', p.shop_name ?? ''].join(' ').toLowerCase()
+            return haystack.includes(q)
+        })
 
     async function toggleDelivery(profile: Profile) {
         if (profile.is_admin) {
@@ -55,6 +64,19 @@ export default function UsersClient({ initialProfiles }: { initialProfiles: Prof
 
     return (
         <div className="space-y-4">
+            <div className="flex items-center justify-between gap-2">
+                <div className="relative w-full max-w-xs">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                        <Search className="w-4 h-4" />
+                    </span>
+                    <Input
+                        value={query}
+                        onChange={e => setQuery(e.target.value)}
+                        placeholder="Buscar por nombre, teléfono o tienda"
+                        className="pl-9"
+                    />
+                </div>
+            </div>
             <div className="flex flex-wrap gap-2">
                 {[
                     { key: 'all' as FilterType, label: 'Todos', count: profiles.length },

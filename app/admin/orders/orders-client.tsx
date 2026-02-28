@@ -79,7 +79,7 @@ export default function OrdersClient({ initialOrders, deliveryOptions }: { initi
         if (error) {
             toast.error('Error: ' + error.message)
         } else {
-            const delivery = deliveryId ? deliveryOptions.find((d) => d.id === deliveryId) ?? null
+            const delivery = deliveryOptions.find((d) => d.id === deliveryId) ?? null
             setOrders((prev) =>
                 prev.map((o) =>
                     o.id === orderId
