@@ -14,7 +14,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 import { CheckoutAddressForm } from '@/components/checkout-address-form'
 import { PaymentQR } from '@/components/payment-qr'
-import { Loader2, ShoppingBag, CheckCircle, MapPin, Phone, FileText } from 'lucide-react'
+import { Loader2, ShoppingBag, MapPin, Phone, FileText, QrCode, Banknote, CheckCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -24,6 +24,7 @@ export default function CheckoutPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'qr'>('cash')
   const [form, setForm] = useState({
     full_name: '',
     phone: '',
@@ -62,6 +63,49 @@ export default function CheckoutPage() {
     })
   }, [])
 
+  // If QR payment and order created → show PaymentQR
+  if (success && createdOrderId && paymentMethod === 'qr') {
+    return (
+      <>
+        <Navbar user={user} profile={profile} authLoading={authLoading} />
+        <main className="max-w-7xl mx-auto px-4 py-12 flex flex-col items-center">
+          <PaymentQR
+            orderId={createdOrderId}
+            totalPrice={orderTotal}
+          />
+        </main>
+        <Footer />
+      </>
+    )
+  }
+
+  // If cash payment and order created → show success
+  if (success && createdOrderId && paymentMethod === 'cash') {
+    return (
+      <>
+        <Navbar user={user} profile={profile} authLoading={authLoading} />
+        <main className="max-w-7xl mx-auto px-4 py-12 flex flex-col items-center">
+          <div className="text-center py-8 animate-in fade-in zoom-in duration-300 max-w-sm">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-green-600" />
+            </div>
+            <h2 className="font-serif text-2xl font-bold text-foreground mb-2">¡Pedido confirmado!</h2>
+            <p className="text-muted-foreground mb-2">
+              Tu pedido ha sido registrado exitosamente.
+            </p>
+            <p className="text-sm text-muted-foreground mb-6">
+              Pagarás <strong>Bs {orderTotal}</strong> en efectivo al momento de la entrega.
+            </p>
+            <Button onClick={() => router.push('/orders')}>
+              Ver mis pedidos
+            </Button>
+          </div>
+        </main>
+        <Footer />
+      </>
+    )
+  }
+
   if (items.length === 0 && !success) {
     return (
       <>
@@ -72,21 +116,6 @@ export default function CheckoutPage() {
           <Button asChild className="mt-4">
             <Link href="/">Ir al mercado</Link>
           </Button>
-        </main>
-        <Footer />
-      </>
-    )
-  }
-
-  if (success && createdOrderId) {
-    return (
-      <>
-        <Navbar user={user} profile={profile} authLoading={authLoading} />
-        <main className="max-w-7xl mx-auto px-4 py-12 flex flex-col items-center">
-          <PaymentQR
-            orderId={createdOrderId}
-            totalPrice={orderTotal}
-          />
         </main>
         <Footer />
       </>
@@ -112,7 +141,7 @@ export default function CheckoutPage() {
     }
 
     // Update user profile with latest details
-    const { error: profileError } = await supabase
+    await supabase
       .from('profiles')
       .update({
         full_name: form.full_name,
@@ -132,6 +161,8 @@ export default function CheckoutPage() {
         address_code: form.address_code || null,
         notes: form.notes || null,
         status: 'pending',
+        payment_method: paymentMethod,
+        payment_status: 'pending',
       })
       .select()
       .single()
@@ -202,7 +233,6 @@ export default function CheckoutPage() {
                     onChange={e => {
                       let val = e.target.value
                       if (!val.startsWith('+591 ')) val = '+591 '
-                      // allow only digits after prefix, max 8
                       const digits = val.slice(5).replace(/\D/g, '').slice(0, 8)
                       setForm(f => ({ ...f, phone: `+591 ${digits}` }))
                     }}
@@ -233,6 +263,81 @@ export default function CheckoutPage() {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Payment Method Selector */}
+            <div className="bg-card border border-border rounded-3xl p-6">
+              <h2 className="font-semibold text-foreground mb-5 flex items-center gap-2">
+                <Banknote className="w-5 h-5 text-primary" />
+                Método de pago
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Cash option */}
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('cash')}
+                  className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 text-left ${paymentMethod === 'cash'
+                      ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                      : 'border-border hover:border-primary/40 bg-card'
+                    }`}
+                >
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${paymentMethod === 'cash' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'
+                    }`}>
+                    <Banknote className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground">Efectivo</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Paga al momento de la entrega</p>
+                  </div>
+                  {paymentMethod === 'cash' && (
+                    <div className="ml-auto">
+                      <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                        <CheckCircle className="w-3.5 h-3.5 text-primary-foreground" />
+                      </div>
+                    </div>
+                  )}
+                </button>
+
+                {/* QR option */}
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('qr')}
+                  className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 text-left ${paymentMethod === 'qr'
+                      ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                      : 'border-border hover:border-primary/40 bg-card'
+                    }`}
+                >
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${paymentMethod === 'qr' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'
+                    }`}>
+                    <QrCode className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground">Transferencia / QR</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Paga via QR y sube tu comprobante</p>
+                  </div>
+                  {paymentMethod === 'qr' && (
+                    <div className="ml-auto">
+                      <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                        <CheckCircle className="w-3.5 h-3.5 text-primary-foreground" />
+                      </div>
+                    </div>
+                  )}
+                </button>
+              </div>
+
+              {paymentMethod === 'qr' && (
+                <p className="text-xs text-muted-foreground mt-3 bg-secondary/50 rounded-xl p-3">
+                  <QrCode className="w-3.5 h-3.5 inline mr-1.5 text-primary" />
+                  Después de confirmar el pedido se te mostrará el código QR y los datos de la cuenta para que realices la transferencia y subas tu comprobante.
+                </p>
+              )}
+
+              {paymentMethod === 'cash' && (
+                <p className="text-xs text-muted-foreground mt-3 bg-secondary/50 rounded-xl p-3">
+                  <Banknote className="w-3.5 h-3.5 inline mr-1.5 text-primary" />
+                  El repartidor cobrará el monto total al momento de entregar tu pedido.
+                </p>
+              )}
             </div>
 
             <Button type="submit" size="lg" className="w-full" disabled={loading}>
@@ -281,9 +386,19 @@ export default function CheckoutPage() {
                 <span>Total</span>
                 <span>Bs {(total + 10).toFixed(0)}</span>
               </div>
-              <p className="text-xs text-muted-foreground mt-3 text-center">
-                Pago contra entrega en tu domicilio
-              </p>
+              <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+                {paymentMethod === 'cash' ? (
+                  <>
+                    <Banknote className="w-3.5 h-3.5 text-primary" />
+                    <span>Pago en efectivo contra entrega</span>
+                  </>
+                ) : (
+                  <>
+                    <QrCode className="w-3.5 h-3.5 text-primary" />
+                    <span>Pago por transferencia / QR</span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
