@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { MapPin, Loader2, Navigation, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -96,7 +96,7 @@ export function CheckoutAddressForm({
         <div className="space-y-4">
             {/* Direccion Principal Escrita */}
             <div className="space-y-2">
-                <Label htmlFor="address" className="text-[#0F172A] font-medium">
+                <Label htmlFor="address" className="text-foreground font-medium">
                     Dirección de entrega <span className="text-destructive">*</span>
                 </Label>
                 <Input
@@ -106,15 +106,15 @@ export function CheckoutAddressForm({
                     value={address}
                     onChange={(e) => onAddressChange(e.target.value)}
                     placeholder="Ej: Calle Linares #45, a lado de la farmacia"
-                    className="border-border text-[#0F172A] focus-visible:ring-primary/50"
+                    className="border-border text-foreground focus-visible:ring-primary/50"
                 />
             </div>
 
-            {/* Plus Code de Geolocalizacion */}
-            <div className="space-y-2 pt-2 bg-slate-50 p-4 rounded-xl border border-slate-100">
+            {/* Plus Code de Geolocalizacion - mismo estilo que el resto del checkout */}
+            <div className="space-y-2 pt-2 bg-secondary/50 p-4 rounded-xl border border-border">
                 <div className="flex items-start justify-between">
-                    <Label className="text-[#0F172A] font-medium flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-[#3B82F6]" />
+                    <Label className="text-foreground font-medium flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-primary" />
                         Ubicación Exacta (Plus Code)
                     </Label>
                     <Button
@@ -123,7 +123,7 @@ export function CheckoutAddressForm({
                         size="sm"
                         onClick={detectLocation}
                         disabled={isLocating}
-                        className="h-8 text-[#3B82F6] hover:text-[#3B82F6] hover:bg-blue-50 px-2 flex items-center gap-1.5"
+                        className="h-8 text-primary hover:text-primary hover:bg-primary/10 px-2 flex items-center gap-1.5"
                     >
                         {isLocating ? (
                             <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -141,7 +141,7 @@ export function CheckoutAddressForm({
                         value={addressCode || ''}
                         onChange={(e) => onAddressCodeChange(e.target.value.toUpperCase())}
                         placeholder="Ej: 8FVX+H3"
-                        className="font-mono text-sm bg-white border-slate-200 text-[#0F172A] focus-visible:ring-primary/50"
+                        className="font-mono text-sm bg-background border-border text-foreground focus-visible:ring-primary/50"
                     />
                     {addressCode && addressCode.includes('+') ? (
                         <Button
@@ -149,7 +149,7 @@ export function CheckoutAddressForm({
                             variant="outline"
                             size="icon"
                             asChild
-                            className="shrink-0 text-[#3B82F6] border-slate-200 hover:bg-slate-100"
+                            className="shrink-0 text-primary border-border hover:bg-secondary"
                             title="Ver en Google Maps"
                         >
                             <a
@@ -165,7 +165,7 @@ export function CheckoutAddressForm({
                             type="button"
                             variant="outline"
                             asChild
-                            className="shrink-0 text-slate-600 border-slate-200 hover:bg-slate-100 text-xs px-3 font-medium"
+                            className="shrink-0 text-muted-foreground border-border hover:bg-secondary text-xs px-3 font-medium"
                             title="Buscar mi código en el mapa"
                         >
                             <a
@@ -180,7 +180,7 @@ export function CheckoutAddressForm({
                 </div>
 
                 {accuracyWarning && (
-                    <div className="bg-amber-50 text-amber-900 p-3 rounded-lg text-xs border border-amber-200 mt-2">
+                    <div className="bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 p-3 rounded-lg text-xs border border-amber-200 dark:border-amber-800 mt-2">
                         {accuracyWarning}
                     </div>
                 )}
@@ -188,7 +188,7 @@ export function CheckoutAddressForm({
                 {locationError ? (
                     <p className="text-xs text-destructive mt-1.5">{locationError}</p>
                 ) : (
-                    <p className="text-xs text-slate-500 mt-1.5">
+                    <p className="text-xs text-muted-foreground mt-1.5">
                         {addressCode
                             ? 'Asegurate de revisar el enlace en Maps para confirmar que sea tu casa.'
                             : 'Se usará tu GPS para ayudar al envío (opcional).'}

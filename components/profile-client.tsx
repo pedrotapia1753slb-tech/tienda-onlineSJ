@@ -51,8 +51,9 @@ export function ProfileClient({ user, profile: initialProfile }: ProfileClientPr
       .single()
 
     if (error) {
+      const msg = error.message || error.details || (typeof error === 'object' ? JSON.stringify(error) : String(error)) || 'Revisa que la tabla profiles tenga las columnas: full_name, phone, address, address_code, is_seller, shop_name, shop_description. Ejecuta scripts/005_profiles_missing_columns.sql en Supabase si falta address_code.'
       console.error('Supabase upsert error:', error)
-      toast.error(`Error al guardar el perfil: ${error.message}`)
+      toast.error(`Error al guardar el perfil: ${msg}`)
     } else {
       setProfile(data as Profile)
       toast.success('Perfil actualizado')
