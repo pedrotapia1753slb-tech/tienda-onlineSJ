@@ -4,6 +4,7 @@ export type Profile = {
   avatar_url: string | null
   phone: string | null
   address: string | null
+  address_code?: string | null
   is_seller: boolean
   is_admin: boolean
   shop_name: string | null
@@ -53,6 +54,7 @@ export type Order = {
   status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
   total: number
   delivery_address: string | null
+  address_code?: string | null
   notes: string | null
   created_at: string
   updated_at: string

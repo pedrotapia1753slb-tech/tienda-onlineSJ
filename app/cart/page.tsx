@@ -9,14 +9,30 @@ import { Plus, Minus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import type { Profile } from '@/lib/types'
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, total, clearCart } = useCart()
+  const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUser(user)
+        supabase.from('profiles').select('*').eq('id', user.id).single()
+          .then(({ data }) => setProfile(data))
+      }
+    })
+  }, [])
 
   if (items.length === 0) {
     return (
       <>
-        <Navbar />
+        <Navbar user={user} profile={profile} />
         <main className="max-w-7xl mx-auto px-4 py-20 text-center">
           <div className="max-w-sm mx-auto">
             <div className="w-20 h-20 rounded-3xl bg-secondary flex items-center justify-center mx-auto mb-5">
@@ -41,7 +57,7 @@ export default function CartPage() {
 
   return (
     <>
-      <Navbar />
+      <Navbar user={user} profile={profile} />
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="font-serif text-3xl font-bold text-foreground">Mi carrito</h1>

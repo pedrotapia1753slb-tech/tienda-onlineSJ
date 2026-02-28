@@ -43,11 +43,16 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
     tags: '',
     is_featured: false,
     is_active: true,
+    // Phone specific fields
+    ram: '',
+    storage: '',
+    battery: '',
+    camera: '',
   })
 
   function openNew() {
     setEditingProduct(null)
-    setForm({ name: '', description: '', price: '', stock: '', unit: 'unidad', category_id: '', images: [], tags: '', is_featured: false, is_active: true })
+    setForm({ name: '', description: '', price: '', stock: '', unit: 'unidad', category_id: '', images: [], tags: '', is_featured: false, is_active: true, ram: '', storage: '', battery: '', camera: '' })
     setShowForm(true)
   }
 
@@ -64,6 +69,10 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
       tags: p.tags?.join(', ') ?? '',
       is_featured: p.is_featured,
       is_active: p.is_active,
+      ram: '',
+      storage: '',
+      battery: '',
+      camera: '',
     })
     setShowForm(true)
   }
@@ -75,9 +84,24 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
     }
     setLoading(true)
     const supabase = createClient()
+    let finalDescription = form.description || ''
+
+    // Si estamos editando un celular y llenaron campos, los anexamos
+    if (selectedCategorySlug === 'celulares') {
+      const specs = []
+      if (form.ram) specs.push(`RAM: ${form.ram}`)
+      if (form.storage) specs.push(`Almacenamiento: ${form.storage}`)
+      if (form.battery) specs.push(`Batería: ${form.battery}`)
+      if (form.camera) specs.push(`Cámara: ${form.camera}`)
+
+      if (specs.length > 0) {
+        finalDescription += `\n\nEspecificaciones:\n` + specs.join('\n')
+      }
+    }
+
     const payload = {
       name: form.name,
-      description: form.description || null,
+      description: finalDescription || null,
       price: parseFloat(form.price),
       original_price: null,
       stock: parseInt(form.stock) || 0,
@@ -130,6 +154,22 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
 
   const activeCount = localProducts.filter(p => p.is_active).length
   const totalStock = localProducts.reduce((s, p) => s + p.stock, 0)
+
+  const selectedCategorySlug = categories.find(c => c.id === form.category_id)?.slug
+
+  const tagPlaceholders: Record<string, string> = {
+    'celulares': 'ej. smartphone, tecnologia, 5g',
+    'tecnologia': 'ej. gadget, accesorios, electronica',
+    'frutas-y-verduras': 'ej. fresco, organico, local',
+    'carnes-y-embutidos': 'ej. cortes, parrilla, fresco',
+    'lacteos-y-huevos': 'ej. granja, fresco, desayuno',
+    'panaderia': 'ej. recien horneado, dulce, integral',
+    'artesanias': 'ej. hecho a mano, local, tradicional',
+  }
+
+  const currentTagPlaceholder = selectedCategorySlug
+    ? tagPlaceholders[selectedCategorySlug] || 'ej. clave1, clave2'
+    : 'Selecciona una categoria primero'
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -233,7 +273,7 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setForm(f => ({ ...f, images: f.images.filter((_, index) => index !== i) })) }}
-                        className="absolute top-1 right-1 bg-black/60 hover:bg-destructive text-white p-1.5 rounded-full transition-colors opacity-0 group-hover:opacity-100"
+                        className="absolute top-1 right-1 bg-black/60 hover:bg-destructive text-white p-1.5 rounded-full transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                         aria-label="Eliminar imagen"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -261,9 +301,36 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
                 </CldUploadWidget>
               )}
             </div>
+
+            {/* Phone specific fields */}
+            {selectedCategorySlug === 'celulares' && (
+              <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-secondary p-4 rounded-2xl">
+                <div className="sm:col-span-2">
+                  <h3 className="font-semibold text-foreground text-sm">Características Técnicas</h3>
+                  <p className="text-xs text-muted-foreground mb-2">Agrega detalles clave del teléfono (se añadirán a la descripción)</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Memoria RAM</Label>
+                  <Input value={form.ram} onChange={e => setForm(f => ({ ...f, ram: e.target.value }))} placeholder="Ej. 8GB" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Almacenamiento</Label>
+                  <Input value={form.storage} onChange={e => setForm(f => ({ ...f, storage: e.target.value }))} placeholder="Ej. 256GB" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Batería</Label>
+                  <Input value={form.battery} onChange={e => setForm(f => ({ ...f, battery: e.target.value }))} placeholder="Ej. 5000 mAh" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Cámara principal</Label>
+                  <Input value={form.camera} onChange={e => setForm(f => ({ ...f, camera: e.target.value }))} placeholder="Ej. 50MP" />
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label>Etiquetas (separadas por comas)</Label>
-              <Input value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} placeholder="tecnologia, celular" />
+              <Input value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} placeholder={currentTagPlaceholder} />
             </div>
             <div className="flex items-center justify-between p-4 bg-secondary rounded-2xl">
               <div>

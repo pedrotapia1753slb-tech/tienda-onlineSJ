@@ -1,16 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { useCart } from '@/lib/cart-context'
 import { createClient } from '@/lib/supabase/client'
+import type { Profile } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
+import { CheckoutAddressForm } from '@/components/checkout-address-form'
 import { Loader2, ShoppingBag, CheckCircle, MapPin, Phone, FileText } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -25,13 +27,38 @@ export default function CheckoutPage() {
     full_name: '',
     phone: '',
     address: '',
+    address_code: '',
     notes: '',
   })
+  const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUser(user)
+        supabase.from('profiles').select('*').eq('id', user.id).single()
+          .then(({ data }) => {
+            if (data) {
+              setProfile(data)
+              setForm(f => ({
+                ...f,
+                full_name: data.full_name || '',
+                phone: data.phone || '',
+                address: data.address || '',
+                address_code: data.address_code || '',
+              }))
+            }
+          })
+      }
+    })
+  }, [])
 
   if (items.length === 0 && !success) {
     return (
       <>
-        <Navbar />
+        <Navbar user={user} profile={profile} />
         <main className="max-w-7xl mx-auto px-4 py-20 text-center">
           <ShoppingBag className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
           <h1 className="font-serif text-2xl font-bold text-foreground mb-2">Tu carrito esta vacio</h1>
@@ -47,7 +74,7 @@ export default function CheckoutPage() {
   if (success) {
     return (
       <>
-        <Navbar />
+        <Navbar user={user} profile={profile} />
         <main className="max-w-md mx-auto px-4 py-20 text-center">
           <div className="w-16 h-16 rounded-2xl bg-green-100 flex items-center justify-center mx-auto mb-5">
             <CheckCircle className="w-8 h-8 text-green-600" />
@@ -95,6 +122,7 @@ export default function CheckoutPage() {
         buyer_id: user.id,
         total,
         delivery_address: `${form.full_name} | ${form.phone} | ${form.address}`,
+        address_code: form.address_code || null,
         notes: form.notes || null,
         status: 'pending',
       })
@@ -131,7 +159,7 @@ export default function CheckoutPage() {
 
   return (
     <>
-      <Navbar />
+      <Navbar user={user} profile={profile} />
       <main className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="font-serif text-3xl font-bold text-foreground mb-8">Finalizar pedido</h1>
 
@@ -168,17 +196,15 @@ export default function CheckoutPage() {
                     required
                   />
                 </div>
-                <div className="sm:col-span-2 space-y-2">
-                  <Label htmlFor="address">Direccion de entrega *</Label>
-                  <Input
-                    id="address"
-                    value={form.address}
-                    onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
-                    placeholder="Calle, numero, colonia, referencias"
-                    required
+                <div className="sm:col-span-2">
+                  <CheckoutAddressForm
+                    address={form.address}
+                    addressCode={form.address_code}
+                    onAddressChange={(address) => setForm(f => ({ ...f, address }))}
+                    onAddressCodeChange={(address_code) => setForm(f => ({ ...f, address_code }))}
                   />
                 </div>
-                <div className="sm:col-span-2 space-y-2">
+                <div className="sm:col-span-2 space-y-2 pt-4">
                   <Label htmlFor="notes">
                     <FileText className="w-3.5 h-3.5 inline mr-1" />
                     Notas para el vendedor (opcional)
@@ -196,7 +222,7 @@ export default function CheckoutPage() {
 
             <Button type="submit" size="lg" className="w-full" disabled={loading}>
               {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-              Confirmar pedido — ${total.toFixed(2)}
+              Confirmar pedido — Bs {(total + 10).toFixed(2)}
             </Button>
           </form>
 
@@ -221,15 +247,24 @@ export default function CheckoutPage() {
                       <p className="text-xs text-muted-foreground">x{item.quantity}</p>
                     </div>
                     <p className="text-sm font-semibold text-foreground shrink-0">
-                      ${(item.product.price * item.quantity).toFixed(2)}
+                      Bs {(item.product.price * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 ))}
               </div>
               <Separator className="my-4" />
+              <div className="flex justify-between text-sm text-muted-foreground mb-1">
+                <span>Subtotal</span>
+                <span>Bs {total.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm text-muted-foreground mb-3">
+                <span>Envío y seguridad</span>
+                <span>Bs 10.00</span>
+              </div>
+              <Separator className="my-3" />
               <div className="flex justify-between font-bold text-foreground text-lg">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>Bs {(total + 10).toFixed(2)}</span>
               </div>
               <p className="text-xs text-muted-foreground mt-3 text-center">
                 Pago contra entrega en tu domicilio

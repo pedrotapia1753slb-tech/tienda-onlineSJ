@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
-import { ShoppingCart, Plus, Minus, Star, Store, Package, ArrowLeft } from 'lucide-react'
+import { ShoppingCart, Plus, Minus, Star, Store, Package, ArrowLeft, ZoomIn, ZoomOut, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
@@ -11,6 +11,8 @@ import type { Product, Review } from '@/lib/types'
 import { toast } from 'sonner'
 import Link from 'next/link'
 import { CldImage } from 'next-cloudinary'
+import { createClient } from '@/lib/supabase/client'
+import { useEffect } from 'react'
 
 type ProductDetailClientProps = {
   product: Product
@@ -22,6 +24,23 @@ export function ProductDetailClient({ product, reviews }: ProductDetailClientPro
   const { addItem } = useCart()
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+
+  // Zoom state
+  const [isZoomed, setIsZoomed] = useState(false)
+  const [scale, setScale] = useState(1)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setCurrentUserId(user.id)
+    })
+  }, [])
+
+  const isOwnProduct = currentUserId === product.seller_id
 
   function handleAdd() {
     addItem(product, quantity)
@@ -70,25 +89,35 @@ export function ProductDetailClient({ product, reviews }: ProductDetailClientPro
             </div>
           )}
           {/* Main image */}
-          <div className="relative aspect-square rounded-2xl overflow-hidden bg-black border border-border flex-1">
+          <div className="relative aspect-square rounded-2xl overflow-hidden bg-black border border-border flex-1 group">
             {product.images?.[selectedImage] ? (
-              product.images[selectedImage].includes('res.cloudinary.com') ? (
-                <CldImage
-                  src={product.images[selectedImage]}
-                  alt={product.name}
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              ) : (
-                <Image
-                  src={product.images[selectedImage]}
-                  alt={product.name}
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              )
+              <>
+                {product.images[selectedImage].includes('res.cloudinary.com') ? (
+                  <CldImage
+                    src={product.images[selectedImage]}
+                    alt={product.name}
+                    fill
+                    className="object-contain"
+                    priority
+                  />
+                ) : (
+                  <Image
+                    src={product.images[selectedImage]}
+                    alt={product.name}
+                    fill
+                    className="object-contain"
+                    priority
+                  />
+                )}
+                {/* Zoom button on main image */}
+                <button
+                  onClick={() => setIsZoomed(true)}
+                  className="absolute bottom-4 right-4 bg-black/60 hover:bg-black/80 text-white p-3 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 sm:opacity-100"
+                  aria-label="Acercar imagen"
+                >
+                  <ZoomIn className="w-5 h-5" />
+                </button>
+              </>
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <Package className="w-16 h-16 text-muted-foreground/30" />
@@ -96,6 +125,69 @@ export function ProductDetailClient({ product, reviews }: ProductDetailClientPro
             )}
           </div>
         </div>
+
+        {/* Zoom Overlay */}
+        {isZoomed && product.images?.[selectedImage] && (
+          <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center overflow-hidden">
+            <button
+              onClick={() => { setIsZoomed(false); setScale(1); setPosition({ x: 0, y: 0 }); }}
+              className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full backdrop-blur-sm transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <div className="absolute bottom-6 flex gap-4 z-10 bg-white/10 backdrop-blur-md p-2 rounded-2xl">
+              <button
+                onClick={() => setScale(s => Math.max(1, s - 0.5))}
+                className="bg-black/50 hover:bg-black/70 text-white p-3 rounded-xl transition-colors disabled:opacity-50"
+                disabled={scale <= 1}
+              >
+                <ZoomOut className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setScale(s => Math.min(4, s + 0.5))}
+                className="bg-black/50 hover:bg-black/70 text-white p-3 rounded-xl transition-colors disabled:opacity-50"
+                disabled={scale >= 4}
+              >
+                <ZoomIn className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Draggable container */}
+            <div
+              className={`relative w-full h-full max-w-5xl max-h-[80vh] flex items-center justify-center transition-transform ${isDragging ? 'cursor-grabbing' : scale > 1 ? 'cursor-grab' : 'cursor-default'}`}
+              onMouseDown={(e) => {
+                if (scale > 1) {
+                  setIsDragging(true)
+                  setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y })
+                }
+              }}
+              onMouseMove={(e) => {
+                if (isDragging && scale > 1) {
+                  setPosition({
+                    x: e.clientX - dragStart.x,
+                    y: e.clientY - dragStart.y
+                  })
+                }
+              }}
+              onMouseUp={() => setIsDragging(false)}
+              onMouseLeave={() => setIsDragging(false)}
+            >
+              <div
+                style={{
+                  transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
+                  transition: isDragging ? 'none' : 'transform 0.2s ease-out'
+                }}
+                className="relative w-full h-full"
+              >
+                {product.images[selectedImage].includes('res.cloudinary.com') ? (
+                  <CldImage src={product.images[selectedImage]} alt={product.name} fill className="object-contain" />
+                ) : (
+                  <Image src={product.images[selectedImage]} alt={product.name} fill className="object-contain" />
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Info */}
         <div className="space-y-5">
@@ -175,14 +267,20 @@ export function ProductDetailClient({ product, reviews }: ProductDetailClientPro
                   </Button>
                 </div>
               </div>
-              <div className="flex gap-3">
-                <Button size="lg" className="flex-1 gap-2" onClick={handleAdd}>
-                  <ShoppingCart className="w-5 h-5" />
-                  Agregar al carrito
-                </Button>
-                <Button size="lg" variant="outline" className="flex-1" asChild>
-                  <Link href="/cart">Ver carrito</Link>
-                </Button>
+              <div className="space-y-2">
+                <div className="flex gap-3 sm:max-w-sm">
+                  <Button className="flex-1 h-10 rounded-xl font-medium" disabled={isOwnProduct} onClick={handleAdd}>
+                    <ShoppingCart className="w-4 h-4 mr-2 shrink-0" /> Agregar
+                  </Button>
+                  <Button variant="outline" className="flex-1 h-10 rounded-xl font-medium" asChild>
+                    <Link href="/cart">Ver carrito</Link>
+                  </Button>
+                </div>
+                {isOwnProduct && (
+                  <p className="text-xs text-destructive text-center font-medium padding-t-1">
+                    Este es tu propio producto, no puedes agregarlo a tu carrito.
+                  </p>
+                )}
               </div>
             </div>
           )}

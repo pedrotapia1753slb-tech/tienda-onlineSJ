@@ -113,7 +113,7 @@
 
 @theme inline {
   --font-sans: 'DM Sans', 'DM Sans Fallback';
-  --font-serif: 'Playfair Display', 'Playfair Display Fallback';
+  --font-serif: 'Outfit', 'Outfit Fallback';
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
   --color-background: var(--background);
   --color-foreground: var(--foreground);

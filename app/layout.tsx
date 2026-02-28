@@ -1,12 +1,12 @@
 import type { Metadata } from 'next'
-import { DM_Sans, Playfair_Display } from 'next/font/google'
+import { DM_Sans, Outfit } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from 'sonner'
 import { CartProvider } from '@/lib/cart-context'
 import './globals.css'
 
 const _dmSans = DM_Sans({ subsets: ['latin'] })
-const _playfair = Playfair_Display({ subsets: ['latin'] })
+const _outfit = Outfit({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'NovaShopSJ — Tu Tienda Local',

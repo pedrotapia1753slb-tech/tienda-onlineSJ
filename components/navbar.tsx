@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   ShoppingCart, Search, Menu, X, User,
-  ChevronDown, Store, Package, LogOut, Shield
+  ChevronDown, Store, Package, LogOut, Shield, Loader2
 } from 'lucide-react'
 import { useCart } from '@/lib/cart-context'
 import { Button } from '@/components/ui/button'
@@ -49,6 +49,55 @@ export function Navbar({ user, profile }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [categories, setCategories] = useState<NavCategory[]>(DEFAULT_CATEGORIES)
+  const [liveResults, setLiveResults] = useState<any[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [showLive, setShowLive] = useState(false)
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)
+  const searchRef = useRef<HTMLFormElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowLive(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) {
+      setLiveResults([])
+      setShowLive(false)
+      return
+    }
+
+    setShowLive(true)
+    setIsSearching(true)
+
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+
+    debounceRef.current = setTimeout(async () => {
+      const supabase = createClient()
+      const term = searchQuery.trim()
+
+      const { data } = await supabase
+        .from('products')
+        .select('id, name, price, images, categories(name)')
+        .eq('is_active', true)
+        .or(`name.ilike.%${term}%,tags.cs.{${term}}`)
+        .limit(3)
+
+      if (data) {
+        setLiveResults(data)
+      }
+      setIsSearching(false)
+    }, 300)
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [searchQuery])
 
   useEffect(() => {
     async function loadCategories() {
@@ -98,16 +147,67 @@ export function Navbar({ user, profile }: NavbarProps) {
         </Link>
 
         {/* Search */}
-        <form onSubmit={handleSearch} className="flex-1 max-w-2xl mx-2">
+        <form ref={searchRef} onSubmit={handleSearch} className="flex-1 max-w-2xl mx-2 relative">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
+              onFocus={() => { if (searchQuery.trim().length >= 2) setShowLive(true) }}
               placeholder="Busca frutas, carnes, artesanias..."
               className="pl-9 pr-4 h-10 bg-muted border-border rounded-sm text-sm focus-visible:ring-primary/50"
             />
           </div>
+
+          {/* Live Search Dropdown */}
+          {showLive && searchQuery.trim().length >= 2 && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-lg overflow-hidden z-50">
+              {isSearching ? (
+                <div className="p-4 flex items-center justify-center text-muted-foreground">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                </div>
+              ) : liveResults.length > 0 ? (
+                <div className="flex flex-col">
+                  {liveResults.map(product => (
+                    <Link
+                      key={product.id}
+                      href={`/product/${product.id}`}
+                      onClick={() => setShowLive(false)}
+                      className="flex items-center gap-3 p-3 hover:bg-secondary transition-colors border-b border-border last:border-0"
+                    >
+                      <div className="relative w-10 h-10 rounded-md overflow-hidden bg-secondary shrink-0">
+                        {product.images?.[0] ? (
+                          <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <Package className="w-5 h-5 absolute inset-0 m-auto text-muted-foreground/50" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="font-semibold">Bs {product.price.toFixed(2)}</span>
+                          {product.categories?.name && (
+                            <span className="text-muted-foreground border-l border-border pl-2">{product.categories.name}</span>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                  <button
+                    type="submit"
+                    className="p-2 text-xs font-medium text-center text-primary bg-secondary/50 hover:bg-secondary transition-colors"
+                    onClick={(e) => { e.preventDefault(); setShowLive(false); handleSearch(e); }}
+                  >
+                    Ver todos los resultados
+                  </button>
+                </div>
+              ) : (
+                <div className="p-4 text-sm text-center text-muted-foreground">
+                  No se encontraron resultados
+                </div>
+              )}
+            </div>
+          )}
         </form>
 
         {/* Actions */}
@@ -224,30 +324,35 @@ export function Navbar({ user, profile }: NavbarProps) {
           {!user ? (
             <div className="flex gap-2 pt-3">
               <Button variant="outline" className="flex-1" asChild>
-                <Link href="/auth/login">Ingresar</Link>
+                <Link href="/auth/login" onClick={() => setMobileOpen(false)}>Ingresar</Link>
               </Button>
               <Button className="flex-1" asChild>
-                <Link href="/auth/register">Registrarse</Link>
+                <Link href="/auth/register" onClick={() => setMobileOpen(false)}>Registrarse</Link>
               </Button>
             </div>
           ) : (
             <div className="pt-3 space-y-1">
-              <Link href="/profile" className="flex items-center gap-2 py-2 text-sm text-foreground">
+              <Link href="/profile" className="flex items-center gap-2 py-2 text-sm text-foreground" onClick={() => setMobileOpen(false)}>
                 <User className="w-4 h-4" /> Mi perfil
               </Link>
-              <Link href="/orders" className="flex items-center gap-2 py-2 text-sm text-foreground">
+              <Link href="/orders" className="flex items-center gap-2 py-2 text-sm text-foreground" onClick={() => setMobileOpen(false)}>
                 <Package className="w-4 h-4" /> Mis pedidos
               </Link>
               {profile?.is_seller && (
-                <Link href="/dashboard" className="flex items-center gap-2 py-2 text-sm text-foreground">
+                <Link href="/dashboard" className="flex items-center gap-2 py-2 text-sm text-foreground" onClick={() => setMobileOpen(false)}>
                   <Store className="w-4 h-4" /> Mi tienda
                 </Link>
               )}
               {profile?.is_admin && (
-                <Link href="/admin" className="flex items-center gap-2 py-2 text-sm text-primary font-medium">
+                <Link href="/admin" className="flex items-center gap-2 py-2 text-sm text-primary font-medium" onClick={() => setMobileOpen(false)}>
                   <Shield className="w-4 h-4" /> Admin Panel
                 </Link>
               )}
+              <form action="/auth/signout" method="post" className="w-full">
+                <button type="submit" className="flex items-center gap-2 py-2 text-sm text-destructive w-full" onClick={() => setMobileOpen(false)}>
+                  <LogOut className="w-4 h-4" /> Cerrar sesion
+                </button>
+              </form>
             </div>
           )}
           <div className="pt-2 border-t border-border">
