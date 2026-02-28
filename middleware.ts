@@ -25,7 +25,8 @@ export async function middleware(request: NextRequest) {
   )
 
   // Refresh the session — keeps auth cookies valid
-  await supabase.auth.getUser()
+  // Type is currently bugged in user's TS environment ('getUser' does not exist on 'SupabaseAuthClient')
+  await (supabase.auth as any).getUser()
 
   return supabaseResponse
 }
