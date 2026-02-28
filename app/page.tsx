@@ -38,6 +38,10 @@ export default async function HomePage() {
     .order('created_at', { ascending: false })
     .limit(8)
 
+  const sellerHref = !user ? '/auth/register' : profile?.is_seller ? '/dashboard' : '/profile'
+  const sellerTextHero = !user ? 'Vender aqui' : profile?.is_seller ? 'Ir a mi tienda' : 'Empezar a vender'
+  const sellerTextBanner = !user ? 'Comenzar gratis' : profile?.is_seller ? 'Ir a mi tienda' : 'Activar mi tienda'
+
   return (
     <>
       <Navbar user={user} profile={profile} />
@@ -65,7 +69,7 @@ export default async function HomePage() {
                     </Link>
                   </Button>
                   <Button size="lg" variant="outline" asChild className="rounded-sm border-foreground/30 hover:bg-foreground hover:text-primary-foreground">
-                    <Link href="/auth/register">Vender aqui</Link>
+                    <Link href={sellerHref}>{sellerTextHero}</Link>
                   </Button>
                 </div>
                 {/* Trust badges */}
@@ -140,7 +144,7 @@ export default async function HomePage() {
             </div>
             <div className="flex gap-3 shrink-0">
               <Button size="lg" className="rounded-sm bg-primary-foreground text-foreground hover:bg-primary-foreground/90" asChild>
-                <Link href="/auth/register">Comenzar gratis</Link>
+                <Link href={sellerHref}>{sellerTextBanner}</Link>
               </Button>
             </div>
           </div>
@@ -178,7 +182,7 @@ export default async function HomePage() {
                 Se el primero en vender tus productos aqui. Registrate y empieza hoy.
               </p>
               <Button asChild>
-                <Link href="/auth/register">Registrarse gratis</Link>
+                <Link href={sellerHref}>{sellerTextHero}</Link>
               </Button>
             </div>
           </section>

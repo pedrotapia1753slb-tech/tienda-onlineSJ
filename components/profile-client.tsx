@@ -42,14 +42,15 @@ export function ProfileClient({ user, profile: initialProfile }: ProfileClientPr
         phone: form.phone || null,
         address: form.address || null,
         is_seller: form.is_seller,
-        shop_name: form.is_seller ? (form.shop_name || null) : null,
-        shop_description: form.is_seller ? (form.shop_description || null) : null,
+        shop_name: form.is_seller ? (form.full_name || null) : null,
+        shop_description: null,
       })
       .select()
       .single()
 
     if (error) {
-      toast.error('Error al guardar el perfil')
+      console.error('Supabase upsert error:', error)
+      toast.error(`Error al guardar el perfil: ${error.message}`)
     } else {
       setProfile(data as Profile)
       toast.success('Perfil actualizado')
@@ -145,30 +146,6 @@ export function ProfileClient({ user, profile: initialProfile }: ProfileClientPr
               onCheckedChange={v => setForm(f => ({ ...f, is_seller: v }))}
             />
           </div>
-          {form.is_seller && (
-            <>
-              <Separator />
-              <div className="space-y-2">
-                <Label htmlFor="shop_name">Nombre de tu tienda</Label>
-                <Input
-                  id="shop_name"
-                  value={form.shop_name}
-                  onChange={e => setForm(f => ({ ...f, shop_name: e.target.value }))}
-                  placeholder="Ej. Verduras La Esperanza"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="shop_description">Descripcion de tu tienda</Label>
-                <Textarea
-                  id="shop_description"
-                  value={form.shop_description}
-                  onChange={e => setForm(f => ({ ...f, shop_description: e.target.value }))}
-                  placeholder="Cuéntale a tus clientes sobre tu negocio..."
-                  rows={3}
-                />
-              </div>
-            </>
-          )}
         </div>
 
         <Button type="submit" size="lg" className="w-full" disabled={loading}>

@@ -10,6 +10,7 @@ import { useCart } from '@/lib/cart-context'
 import type { Product, Review } from '@/lib/types'
 import { toast } from 'sonner'
 import Link from 'next/link'
+import { CldImage } from 'next-cloudinary'
 
 type ProductDetailClientProps = {
   product: Product
@@ -55,13 +56,23 @@ export function ProductDetailClient({ product, reviews }: ProductDetailClientPro
         <div className="space-y-3">
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-secondary border border-border">
             {product.images?.[selectedImage] ? (
-              <Image
-                src={product.images[selectedImage]}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-              />
+              product.images[selectedImage].includes('res.cloudinary.com') ? (
+                <CldImage
+                  src={product.images[selectedImage]}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <Image
+                  src={product.images[selectedImage]}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              )
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <Package className="w-16 h-16 text-muted-foreground/30" />
@@ -79,11 +90,14 @@ export function ProductDetailClient({ product, reviews }: ProductDetailClientPro
                 <button
                   key={i}
                   onClick={() => setSelectedImage(i)}
-                  className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-colors ${
-                    i === selectedImage ? 'border-primary' : 'border-border hover:border-primary/50'
-                  }`}
+                  className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-colors ${i === selectedImage ? 'border-primary' : 'border-border hover:border-primary/50'
+                    }`}
                 >
-                  <Image src={img} alt={`Imagen ${i + 1}`} fill className="object-cover" />
+                  {img.includes('res.cloudinary.com') ? (
+                    <CldImage src={img} alt={`Imagen ${i + 1}`} fill className="object-cover" />
+                  ) : (
+                    <Image src={img} alt={`Imagen ${i + 1}`} fill className="object-cover" />
+                  )}
                 </button>
               ))}
             </div>

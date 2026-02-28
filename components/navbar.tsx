@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
-  ShoppingCart, Search, Menu, X, MapPin, User,
-  ChevronDown, Store, Package, LogOut
+  ShoppingCart, Search, Menu, X, User,
+  ChevronDown, Store, Package, LogOut, Shield
 } from 'lucide-react'
 import { useCart } from '@/lib/cart-context'
 import { Button } from '@/components/ui/button'
@@ -19,17 +19,59 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
 import type { Profile } from '@/lib/types'
+import { createClient } from '@/lib/supabase/client'
 
 type NavbarProps = {
   user?: { id: string; email?: string } | null
   profile?: Profile | null
 }
 
+type NavCategory = {
+  label: string
+  href: string
+}
+
+const DEFAULT_CATEGORIES: NavCategory[] = [
+  { label: 'Todos', href: '/products' },
+  { label: 'Frutas y Verduras', href: '/category/frutas-verduras' },
+  { label: 'Carnes', href: '/category/carnes-embutidos' },
+  { label: 'Lacteos', href: '/category/lacteos-huevos' },
+  { label: 'Panaderia', href: '/category/panaderia' },
+  { label: 'Abarrotes', href: '/category/abarrotes' },
+  { label: 'Artesanias', href: '/category/artesanias' },
+  { label: 'Bebidas', href: '/category/bebidas' },
+  { label: 'Comida Preparada', href: '/category/comida-preparada' },
+]
+
 export function Navbar({ user, profile }: NavbarProps) {
   const { count } = useCart()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [categories, setCategories] = useState<NavCategory[]>(DEFAULT_CATEGORIES)
+
+  useEffect(() => {
+    async function loadCategories() {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('categories')
+        .select('name, slug, products(id)')
+
+      if (!error && data && data.length > 0) {
+        const sorted = data.map(cat => ({
+          label: cat.name,
+          href: `/category/${cat.slug}`,
+          count: cat.products?.length || 0
+        })).sort((a, b) => b.count - a.count)
+
+        setCategories([
+          { label: 'Todos', href: '/products' },
+          ...sorted.map(s => ({ label: s.label, href: s.href }))
+        ])
+      }
+    }
+    loadCategories()
+  }, [])
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -40,12 +82,6 @@ export function Navbar({ user, profile }: NavbarProps) {
 
   return (
     <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
-      {/* Top bar — deep green banner */}
-      <div className="bg-primary text-primary-foreground text-xs py-1.5 px-4 text-center font-sans tracking-wide">
-        <MapPin className="inline w-3 h-3 mr-1" />
-        Entrega en tu comunidad — Productos frescos y locales cada dia
-      </div>
-
       {/* Main nav */}
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
         {/* Logo */}
@@ -108,6 +144,16 @@ export function Navbar({ user, profile }: NavbarProps) {
                     </DropdownMenuItem>
                   </>
                 )}
+                {profile?.is_admin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin" className="flex items-center gap-2 text-primary font-medium">
+                        <Shield className="w-4 h-4" /> Admin Panel
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <form action="/auth/signout" method="post">
@@ -158,17 +204,7 @@ export function Navbar({ user, profile }: NavbarProps) {
       <nav className="border-t border-border bg-foreground overflow-x-auto scrollbar-none hidden sm:block">
         <div className="max-w-7xl mx-auto px-4">
           <ul className="flex items-center gap-0 text-sm">
-            {[
-              { label: 'Todos', href: '/products' },
-              { label: 'Frutas y Verduras', href: '/category/frutas-verduras' },
-              { label: 'Carnes', href: '/category/carnes-embutidos' },
-              { label: 'Lacteos', href: '/category/lacteos-huevos' },
-              { label: 'Panaderia', href: '/category/panaderia' },
-              { label: 'Abarrotes', href: '/category/abarrotes' },
-              { label: 'Artesanias', href: '/category/artesanias' },
-              { label: 'Bebidas', href: '/category/bebidas' },
-              { label: 'Comida Preparada', href: '/category/comida-preparada' },
-            ].map(item => (
+            {categories.map(item => (
               <li key={item.href}>
                 <Link
                   href={item.href}
@@ -207,20 +243,17 @@ export function Navbar({ user, profile }: NavbarProps) {
                   <Store className="w-4 h-4" /> Mi tienda
                 </Link>
               )}
+              {profile?.is_admin && (
+                <Link href="/admin" className="flex items-center gap-2 py-2 text-sm text-primary font-medium">
+                  <Shield className="w-4 h-4" /> Admin Panel
+                </Link>
+              )}
             </div>
           )}
           <div className="pt-2 border-t border-border">
             <p className="text-xs text-muted-foreground mb-2 font-medium">Categorias</p>
             <div className="flex flex-wrap gap-2">
-              {[
-                { label: 'Frutas', href: '/category/frutas-verduras' },
-                { label: 'Carnes', href: '/category/carnes-embutidos' },
-                { label: 'Lacteos', href: '/category/lacteos-huevos' },
-                { label: 'Panaderia', href: '/category/panaderia' },
-                { label: 'Abarrotes', href: '/category/abarrotes' },
-                { label: 'Artesanias', href: '/category/artesanias' },
-                { label: 'Bebidas', href: '/category/bebidas' },
-              ].map(item => (
+              {categories.slice(1).map(item => (
                 <Link
                   key={item.href}
                   href={item.href}

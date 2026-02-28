@@ -17,6 +17,7 @@ import {
 import type { Product, Profile, Category } from '@/lib/types'
 import { toast } from 'sonner'
 import Image from 'next/image'
+import { CldUploadWidget } from 'next-cloudinary'
 
 type DashboardClientProps = {
   profile: Profile
@@ -39,7 +40,7 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
     stock: '',
     unit: 'unidad',
     category_id: '',
-    images: '',
+    images: [] as string[],
     tags: '',
     is_featured: false,
     is_active: true,
@@ -47,7 +48,7 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
 
   function openNew() {
     setEditingProduct(null)
-    setForm({ name: '', description: '', price: '', original_price: '', stock: '', unit: 'unidad', category_id: '', images: '', tags: '', is_featured: false, is_active: true })
+    setForm({ name: '', description: '', price: '', original_price: '', stock: '', unit: 'unidad', category_id: '', images: [], tags: '', is_featured: false, is_active: true })
     setShowForm(true)
   }
 
@@ -61,7 +62,7 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
       stock: String(p.stock),
       unit: p.unit,
       category_id: p.category_id ?? '',
-      images: p.images?.join(', ') ?? '',
+      images: p.images ?? [],
       tags: p.tags?.join(', ') ?? '',
       is_featured: p.is_featured,
       is_active: p.is_active,
@@ -84,7 +85,7 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
       stock: parseInt(form.stock) || 0,
       unit: form.unit,
       category_id: form.category_id || null,
-      images: form.images ? form.images.split(',').map(s => s.trim()).filter(Boolean) : [],
+      images: form.images,
       tags: form.tags ? form.tags.split(',').map(s => s.trim()).filter(Boolean) : [],
       is_featured: form.is_featured,
       is_active: form.is_active,
@@ -217,9 +218,43 @@ export function DashboardClient({ profile, products, categories, orderItems, tot
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label>URLs de imagenes (separadas por comas)</Label>
-              <Input value={form.images} onChange={e => setForm(f => ({ ...f, images: e.target.value }))} placeholder="https://... , https://..." />
+            <div className="sm:col-span-2 space-y-3">
+              <Label>Imagenes del producto (Hasta 10)</Label>
+              {form.images.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
+                  {form.images.map((url, i) => (
+                    <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-border bg-secondary group">
+                      <Image src={url} alt={`Imagen ${i + 1}`} fill className="object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setForm(f => ({ ...f, images: f.images.filter((_, index) => index !== i) }))}
+                        className="absolute top-1 right-1 bg-black/60 hover:bg-destructive text-white p-1.5 rounded-full transition-colors opacity-0 group-hover:opacity-100"
+                        aria-label="Eliminar imagen"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {form.images.length < 10 && (
+                <CldUploadWidget
+                  uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'novashop_images'}
+                  options={{ maxFiles: 10 - form.images.length, multiple: true, folder: 'products', sources: ['local'] }}
+                  onSuccess={(result) => {
+                    const info = result.info as any
+                    if (info?.secure_url) {
+                      setForm(f => ({ ...f, images: [...f.images, info.secure_url] }))
+                    }
+                  }}
+                >
+                  {({ open }) => (
+                    <Button type="button" variant="outline" onClick={() => open()} className="w-full border-dashed py-8 bg-secondary/50 hover:bg-secondary">
+                      <Plus className="w-4 h-4 mr-2" /> Agregar fotos
+                    </Button>
+                  )}
+                </CldUploadWidget>
+              )}
             </div>
             <div className="space-y-2">
               <Label>Etiquetas (separadas por comas)</Label>

@@ -56,14 +56,14 @@ export default function RegisterPage() {
       return
     }
 
-    // Update profile with seller info if available
-    if (data.user && form.isSeller && form.shopName) {
+    // Update profile with seller info if opted in
+    if (data.user && form.isSeller) {
       await supabase.from('profiles').upsert({
         id: data.user.id,
         full_name: form.fullName,
         is_seller: true,
-        shop_name: form.shopName,
-        shop_description: form.shopDescription || null,
+        shop_name: form.fullName, // Venden bajo su mismo nombre
+        shop_description: null,
       })
     }
 
@@ -156,28 +156,13 @@ export default function RegisterPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-sm text-foreground">Quiero vender aqui</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Crea tu tienda y publica productos</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Publica y vende tus productos directamente</p>
                   </div>
                   <Switch
                     checked={form.isSeller}
                     onCheckedChange={v => update('isSeller', v)}
                   />
                 </div>
-                {form.isSeller && (
-                  <div className="mt-4 space-y-3">
-                    <Input
-                      value={form.shopName}
-                      onChange={e => update('shopName', e.target.value)}
-                      placeholder="Nombre de tu tienda"
-                      required={form.isSeller}
-                    />
-                    <Input
-                      value={form.shopDescription}
-                      onChange={e => update('shopDescription', e.target.value)}
-                      placeholder="Breve descripcion (opcional)"
-                    />
-                  </div>
-                )}
               </div>
             </div>
 

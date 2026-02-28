@@ -39,8 +39,30 @@ export async function middleware(request: NextRequest) {
       }
     )
 
-    // Aqui opcionalmente pudieras actualizar la sesion (await supabase.auth.getUser()), 
-    // pero si no proteges rutas por defecto, te la puedes ahorrar.
+    // IMPORTANT: Se DEBE llamar a getUser para que las sesiones recién creadas
+    // (login y oauth) refresquen sus cookies y el Servidor se entere en la misma pasada.
+    const { data: { user } } = await supabase.auth.getUser()
+
+    // -------------------------------------------------------------
+    // PROTECCIÓN DE RUTAS DE ADMINISTRADOR (/admin/*)
+    // -------------------------------------------------------------
+    if (request.nextUrl.pathname.startsWith('/admin')) {
+      if (!user) {
+        return NextResponse.redirect(new URL('/auth/login', request.url))
+      }
+
+      // Verificar si el usuario tiene el rol is_admin en su perfil
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single()
+
+      if (!profile?.is_admin) {
+        console.warn(`Intento de acceso no autorizado al admin por el usuario: ${user.id}`)
+        return NextResponse.redirect(new URL('/', request.url)) // Expulsado al inicio
+      }
+    }
 
     return supabaseResponse
   } catch (error) {

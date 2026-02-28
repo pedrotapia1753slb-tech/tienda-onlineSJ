@@ -4,96 +4,111 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* ── Elegant Green · White · Black palette ── */
+  /* ── E-commerce Trust Palette (MercadoLibre / Amazon Style) ── */
 
-  /* Background: warm near-white */
-  --background: oklch(0.98 0.004 120);
-  --foreground: oklch(0.11 0.012 150);
+  /* Background Principal: Gris extremadamente claro para que las tarjetas blancas de productos salten a la vista */
+  --background: oklch(0.98 0.005 260);
+  /* Foreground Principal: Texto oscuro para legibilidad (Gris carbón) */
+  --foreground: oklch(0.2 0.02 260);
 
-  /* Cards: pure white with subtle separation */
+  /* Cards (Tarjetas de productos): Blanco puro */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.11 0.012 150);
+  --card-foreground: oklch(0.2 0.02 260);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.11 0.012 150);
+  --popover-foreground: oklch(0.2 0.02 260);
 
-  /* Primary: deep forest green */
-  --primary: oklch(0.32 0.09 155);
-  --primary-foreground: oklch(0.98 0.004 120);
+  /* Primary (Menú superior y marca): Azul Marino Profundo (Estilo Amazon) */
+  /* Si prefirieses el estílo MercadoLibre, este sería Amarillo: oklch(0.9 0.2 100) */
+  --primary: oklch(0.25 0.04 260);
+  --primary-foreground: oklch(1 0 0);
+  /* Texto blanco sobre el nav azul oscuro */
 
-  /* Secondary: soft sage wash */
-  --secondary: oklch(0.94 0.018 145);
-  --secondary-foreground: oklch(0.25 0.06 150);
+  /* Secondary: Gris suave para elementos secundarios */
+  --secondary: oklch(0.95 0.01 260);
+  --secondary-foreground: oklch(0.2 0.02 260);
 
-  /* Muted: very light grey-green */
-  --muted: oklch(0.95 0.008 130);
-  --muted-foreground: oklch(0.46 0.022 150);
+  /* Muted: Textos deshabilitados o bordes finos */
+  --muted: oklch(0.95 0.01 260);
+  --muted-foreground: oklch(0.55 0.02 260);
 
-  /* Accent: champagne gold */
-  --accent: oklch(0.72 0.09 82);
-  --accent-foreground: oklch(0.11 0.012 150);
+  /* Accent (Botones de "Comprar", Llamados a la acción): Naranja/Amarillo Vibrante */
+  --accent: oklch(0.75 0.18 55);
+  --accent-foreground: oklch(0.15 0.02 260);
+  /* Texto oscuro/negro potente sobre el botón naranja/amarillo */
 
   --destructive: oklch(0.52 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
 
-  /* Borders: crisp, thin */
-  --border: oklch(0.88 0.012 140);
-  --input: oklch(0.92 0.008 130);
-  --ring: oklch(0.32 0.09 155);
+  /* Borders: separaciones limpias */
+  --border: oklch(0.90 0.01 260);
+  --input: oklch(0.90 0.01 260);
+  --ring: oklch(0.75 0.18 55);
+  /* El foco (ring) usa el color naranja vibrante */
 
   /* Charts */
-  --chart-1: oklch(0.32 0.09 155);
-  --chart-2: oklch(0.72 0.09 82);
-  --chart-3: oklch(0.50 0.10 160);
-  --chart-4: oklch(0.65 0.06 145);
-  --chart-5: oklch(0.20 0.05 155);
+  --chart-1: oklch(0.25 0.04 260);
+  --chart-2: oklch(0.75 0.18 55);
+  --chart-3: oklch(0.5 0.1 260);
+  --chart-4: oklch(0.8 0.05 250);
+  --chart-5: oklch(0.3 0.05 260);
 
-  /* Radius: sharper for elegance */
-  --radius: 0.375rem;
+  --radius: 0.25rem;
 
   /* Sidebar */
-  --sidebar: oklch(0.11 0.012 150);
-  --sidebar-foreground: oklch(0.93 0.012 140);
-  --sidebar-primary: oklch(0.72 0.09 82);
-  --sidebar-primary-foreground: oklch(0.11 0.012 150);
-  --sidebar-accent: oklch(0.20 0.04 150);
-  --sidebar-accent-foreground: oklch(0.93 0.012 140);
-  --sidebar-border: oklch(0.22 0.04 150);
-  --sidebar-ring: oklch(0.72 0.09 82);
+  --sidebar: oklch(0.98 0.01 260);
+  --sidebar-foreground: oklch(0.2 0.02 260);
+  --sidebar-primary: oklch(0.25 0.04 260);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.95 0.01 260);
+  --sidebar-accent-foreground: oklch(0.2 0.02 260);
+  --sidebar-border: oklch(0.90 0.01 260);
+  --sidebar-ring: oklch(0.75 0.18 55);
 }
 
 .dark {
-  --background: oklch(0.10 0.012 150);
-  --foreground: oklch(0.95 0.008 130);
-  --card: oklch(0.14 0.014 150);
-  --card-foreground: oklch(0.95 0.008 130);
-  --popover: oklch(0.14 0.014 150);
-  --popover-foreground: oklch(0.95 0.008 130);
-  --primary: oklch(0.58 0.12 152);
-  --primary-foreground: oklch(0.10 0.012 150);
-  --secondary: oklch(0.20 0.035 150);
-  --secondary-foreground: oklch(0.88 0.012 140);
-  --muted: oklch(0.18 0.02 150);
-  --muted-foreground: oklch(0.60 0.02 145);
-  --accent: oklch(0.72 0.09 82);
-  --accent-foreground: oklch(0.10 0.012 150);
+  /* E-commerce Dark Mode */
+  --background: oklch(0.15 0.02 260);
+  --foreground: oklch(0.98 0.01 260);
+
+  --card: oklch(0.18 0.02 260);
+  --card-foreground: oklch(0.98 0.01 260);
+  --popover: oklch(0.18 0.02 260);
+  --popover-foreground: oklch(0.98 0.01 260);
+
+  --primary: oklch(0.98 0.01 260);
+  --primary-foreground: oklch(0.15 0.02 260);
+
+  --secondary: oklch(0.22 0.02 260);
+  --secondary-foreground: oklch(0.98 0.01 260);
+
+  --muted: oklch(0.22 0.02 260);
+  --muted-foreground: oklch(0.7 0.02 260);
+
+  /* Se mantiene el mismo naranja para asegurar visibilidad de botones de compra */
+  --accent: oklch(0.75 0.18 55);
+  --accent-foreground: oklch(0.15 0.02 260);
+
   --destructive: oklch(0.46 0.20 25);
   --destructive-foreground: oklch(0.95 0 0);
-  --border: oklch(0.22 0.03 150);
-  --input: oklch(0.20 0.025 150);
-  --ring: oklch(0.58 0.12 152);
-  --chart-1: oklch(0.58 0.12 152);
-  --chart-2: oklch(0.72 0.09 82);
-  --chart-3: oklch(0.48 0.10 160);
-  --chart-4: oklch(0.68 0.07 145);
-  --chart-5: oklch(0.82 0.04 120);
-  --sidebar: oklch(0.09 0.010 150);
-  --sidebar-foreground: oklch(0.93 0.012 140);
-  --sidebar-primary: oklch(0.72 0.09 82);
-  --sidebar-primary-foreground: oklch(0.10 0.012 150);
-  --sidebar-accent: oklch(0.18 0.030 150);
-  --sidebar-accent-foreground: oklch(0.88 0.012 140);
-  --sidebar-border: oklch(0.20 0.025 150);
-  --sidebar-ring: oklch(0.58 0.12 152);
+
+  --border: oklch(0.25 0.02 260);
+  --input: oklch(0.25 0.02 260);
+  --ring: oklch(0.75 0.18 55);
+
+  --chart-1: oklch(0.75 0.18 55);
+  --chart-2: oklch(0.8 0.05 250);
+  --chart-3: oklch(0.5 0.1 260);
+  --chart-4: oklch(0.7 0.05 260);
+  --chart-5: oklch(0.3 0.05 260);
+
+  --sidebar: oklch(0.12 0.02 260);
+  --sidebar-foreground: oklch(0.98 0.01 260);
+  --sidebar-primary: oklch(0.75 0.18 55);
+  --sidebar-primary-foreground: oklch(0.15 0.02 260);
+  --sidebar-accent: oklch(0.22 0.02 260);
+  --sidebar-accent-foreground: oklch(0.98 0.01 260);
+  --sidebar-border: oklch(0.25 0.02 260);
+  --sidebar-ring: oklch(0.75 0.18 55);
 }
 
 @theme inline {
@@ -142,6 +157,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

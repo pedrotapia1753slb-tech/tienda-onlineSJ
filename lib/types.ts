@@ -5,6 +5,7 @@ export type Profile = {
   phone: string | null
   address: string | null
   is_seller: boolean
+  is_admin: boolean
   shop_name: string | null
   shop_description: string | null
   shop_logo_url: string | null
